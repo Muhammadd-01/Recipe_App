@@ -3,17 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Discover delicious recipes from around the world with our recipe app. Search, filter, and save your favorite recipes.">
+    <meta name="description" content="Discover delicious recipes from around the world with Flavor Vault. Search, filter, and save your favorite recipes.">
     <meta property="og:title" content="Flavor Vault - Discover Delicious Recipes">
     <meta property="og:description" content="Search thousands of recipes, find cooking inspiration, and save your favorites.">
     <meta property="og:image" content="/placeholder.svg?height=630&width=1200">
     <meta property="og:url" content="https://flavorvault.example.com">
     <meta property="twitter:card" content="summary_large_image">
     <title>Flavor Vault - Discover Delicious Recipes</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF8A00', // Orange
+                        secondary: '#4CAF50', // Green
+                        accent: '#8D6E63', // Brown
+                        highlight: '#FFC107', // Yellow
+                        light: {
+                            bg: '#FFF9EB',
+                            card: '#FFFFFF',
+                            text: '#333333',
+                            textLight: '#555555',
+                            border: '#EAEAEA'
+                        },
+                        dark: {
+                            bg: '#2A2A2A',
+                            card: '#3D3D3D',
+                            text: '#F5F5F5',
+                            textLight: '#BDBDBD',
+                            border: '#444444'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['"Playfair Display"', 'serif'],
+                        body: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom Styles -->
+    <style>
+        /* Base styles that work better with custom CSS than Tailwind */
+        .recipe-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .recipe-card:hover {
+            transform: translateY(-5px);
+        }
+        .recipe-card img {
+            transition: transform 0.5s ease;
+        }
+        .recipe-card:hover img {
+            transform: scale(1.05);
+        }
+        .favorite-btn {
+            transition: all 0.3s ease;
+        }
+        .favorite-btn:hover {
+            transform: scale(1.1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #FF8A00;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Autocomplete dropdown */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff;
+            border-bottom: 1px solid #d4d4d4;
+        }
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9;
+        }
+        .autocomplete-active {
+            background-color: #FF8A00 !important;
+            color: #ffffff;
+        }
+    </style>
     <!-- Recipe Schema Markup -->
     <script type="application/ld+json">
     {
@@ -29,140 +139,356 @@
     }
     </script>
 </head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <div class="logo">
-                <h1>Flavor Vault</h1>
+<body class="font-body bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white dark:bg-dark-card shadow-md">
+        <div class="container mx-auto px-4">
+            <!-- Top Navigation Bar -->
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <h1 class="font-heading font-bold text-primary text-2xl">Flavor Vault</h1>
+                    </a>
+                </div>
+                
+                <!-- Search Bar (Medium and Large Screens) -->
+                <div class="hidden md:block relative w-1/3">
+                    <div class="relative autocomplete">
+                        <input type="text" id="search-input" 
+                            class="w-full py-2 pl-10 pr-4 rounded-full border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-primary" 
+                            placeholder="Search recipes or ingredients...">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        <div id="autocomplete-list" class="autocomplete-items rounded-b-lg shadow-lg"></div>
+                    </div>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link active" data-view="home">Home</a>
+                    <a href="about.html" class="nav-link">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="#" class="nav-link" data-view="favorites">
+                        <i class="fas fa-heart mr-1"></i> Favorites
+                    </a>
+                    <!-- Theme Toggle -->
+                    <div class="relative">
+                        <input type="checkbox" id="theme-toggle" class="hidden">
+                        <label for="theme-toggle" class="flex items-center justify-between w-12 h-6 bg-accent rounded-full p-1 cursor-pointer">
+                            <span class="text-xs">☀️</span>
+                            <span class="text-xs">🌙</span>
+                            <div class="absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
+                        </label>
+                    </div>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden text-light-text dark:text-dark-text">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
             </div>
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="#" class="active" data-view="home">Home</a></li>
-                    <li><a href="#" data-view="favorites">Favorites</a></li>
-                    <li>
-                        <div class="theme-toggle">
-                            <input type="checkbox" id="theme-toggle" class="theme-toggle-input">
-                            <label for="theme-toggle" class="theme-toggle-label">
-                                <span class="toggle-icon light-icon">☀️</span>
-                                <span class="toggle-icon dark-icon">🌙</span>
+            
+            <!-- Mobile Search Bar -->
+            <div class="md:hidden pb-4">
+                <div class="relative autocomplete">
+                    <input type="text" id="mobile-search-input" 
+                        class="w-full py-2 pl-10 pr-4 rounded-full border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-primary" 
+                        placeholder="Search recipes or ingredients...">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <div id="mobile-autocomplete-list" class="autocomplete-items rounded-b-lg shadow-lg"></div>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="md:hidden hidden pb-4 animate-fade-in">
+                <nav class="flex flex-col space-y-3">
+                    <a href="index.html" class="mobile-nav-link active py-2 px-4 rounded" data-view="home">Home</a>
+                    <a href="about.html" class="mobile-nav-link py-2 px-4 rounded">About</a>
+                    <a href="contact.html" class="mobile-nav-link py-2 px-4 rounded">Contact</a>
+                    <a href="#" class="mobile-nav-link py-2 px-4 rounded" data-view="favorites">
+                        <i class="fas fa-heart mr-1"></i> Favorites
+                    </a>
+                    <div class="flex items-center py-2 px-4">
+                        <span class="mr-2">Theme:</span>
+                        <div class="relative">
+                            <input type="checkbox" id="mobile-theme-toggle" class="hidden">
+                            <label for="mobile-theme-toggle" class="flex items-center justify-between w-12 h-6 bg-accent rounded-full p-1 cursor-pointer">
+                                <span class="text-xs">☀️</span>
+                                <span class="text-xs">🌙</span>
+                                <div class="absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
                             </label>
                         </div>
-                    </li>
-                </ul>
-            </nav>
+                    </div>
+                </nav>
+            </div>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Discover Delicious Recipes</h2>
-                <p>Find inspiration for your next culinary adventure</p>
-                <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search recipes or ingredients...">
-                    <button id="search-button">Search</button>
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-primary to-highlight text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="font-heading text-4xl md:text-5xl font-bold mb-4">Discover Delicious Recipes</h2>
+                <p class="text-lg md:text-xl mb-8">Find inspiration for your next culinary adventure</p>
+                <div class="flex flex-col md:flex-row justify-center">
+                    <button id="trending-btn" class="bg-white text-primary font-medium py-3 px-6 rounded-full hover:bg-gray-100 transition duration-300 mb-4 md:mb-0 md:mr-4">
+                        <i class="fas fa-fire mr-2"></i> Trending Recipes
+                    </button>
+                    <button id="random-recipe-btn" class="bg-accent text-white font-medium py-3 px-6 rounded-full hover:bg-opacity-90 transition duration-300">
+                        <i class="fas fa-random mr-2"></i> Surprise Me
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="category-filter">
-        <div class="container">
-            <h3>Filter by Category</h3>
-            <div class="filter-buttons" id="category-buttons">
+    <!-- Category Filter -->
+    <section class="bg-white dark:bg-dark-card py-8 shadow-sm">
+        <div class="container mx-auto px-4">
+            <h3 class="font-heading text-xl mb-4 dark:text-dark-text">Filter by Category</h3>
+            <div class="flex flex-wrap gap-2" id="category-buttons">
                 <!-- Categories will be dynamically added here -->
-                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn active bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border px-4 py-2 rounded-md font-medium hover:bg-primary hover:text-white transition duration-300" data-category="all">All</button>
             </div>
         </div>
     </section>
 
-    <main class="main-content">
-        <div class="container">
+    <!-- Main Content -->
+    <main class="flex-grow py-10">
+        <div class="container mx-auto px-4">
+            <!-- Home View -->
             <section id="home-view" class="app-view active">
-                <div id="loading-spinner" class="loading-spinner">
+                <!-- Featured Recipe (New) -->
+                <div id="featured-recipe" class="mb-12 animate-fade-in hidden">
+                    <h2 class="font-heading text-2xl md:text-3xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-star text-highlight mr-2"></i> Featured Recipe
+                    </h2>
+                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg">
+                        <!-- Content will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <!-- Loading Spinner -->
+                <div id="loading-spinner" class="flex justify-center items-center min-h-[300px]">
                     <div class="spinner"></div>
                 </div>
-                <div id="recipes-container" class="recipes-grid">
+                
+                <!-- Recipe Grid -->
+                <div id="recipes-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- Recipe cards will be dynamically added here -->
                 </div>
+                
+                <!-- Load More Button -->
+                <div class="text-center mt-10">
+                    <button id="load-more-btn" class="bg-primary text-white font-medium py-3 px-8 rounded-full hover:bg-opacity-90 transition duration-300">
+                        <i class="fas fa-plus mr-2"></i> Load More Recipes
+                    </button>
+                </div>
             </section>
 
+            <!-- Favorites View -->
             <section id="favorites-view" class="app-view">
-                <h2 class="section-title">Your Favorite Recipes</h2>
-                <div id="favorites-container" class="recipes-grid">
+                <h2 class="font-heading text-2xl md:text-3xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-heart text-red-500 mr-2"></i> Your Favorite Recipes
+                </h2>
+                <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- Favorite recipes will be dynamically added here -->
                 </div>
-                <div id="no-favorites" class="no-content">
-                    <p>You haven't saved any favorites yet. Start exploring and save recipes you love!</p>
+                <div id="no-favorites" class="text-center py-16 text-light-textLight dark:text-dark-textLight">
+                    <i class="far fa-heart text-5xl mb-4"></i>
+                    <p class="text-lg">You haven't saved any favorites yet.</p>
+                    <p class="mb-6">Start exploring and save recipes you love!</p>
+                    <a href="#" class="inline-block bg-primary text-white font-medium py-2 px-6 rounded-full hover:bg-opacity-90 transition duration-300" id="explore-recipes-btn">
+                        Explore Recipes
+                    </a>
                 </div>
             </section>
 
+            <!-- Recipe Details View -->
             <section id="recipe-details-view" class="app-view">
-                <button id="back-button" class="back-button">← Back</button>
-                <article id="recipe-details-container" class="recipe-details">
+                <button id="back-button" class="flex items-center text-primary font-medium mb-6 hover:text-accent transition duration-300">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Recipes
+                </button>
+                <article id="recipe-details-container" class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg mb-12">
                     <!-- Recipe details will be dynamically added here -->
                 </article>
+                
+                <!-- Similar Recipes (New) -->
+                <div id="similar-recipes-section" class="mt-12 hidden">
+                    <h3 class="font-heading text-2xl font-bold mb-6">You Might Also Like</h3>
+                    <div id="similar-recipes-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Similar recipes will be dynamically added here -->
+                    </div>
+                </div>
             </section>
         </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <h2>Flavor Vault</h2>
-                    <p>Discover, cook, and enjoy delicious recipes.</p>
-                </div>
-                <div class="footer-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-                <div class="footer-newsletter">
-                    <h3>Stay Updated</h3>
-                    <p>Subscribe to our newsletter for new recipes and cooking tips.</p>
-                    <div class="newsletter-form">
-                        <input type="email" placeholder="Your email address">
-                        <button>Subscribe</button>
+    <!-- Newsletter Section (New) -->
+    <section class="bg-gradient-to-r from-secondary to-primary py-16 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="font-heading text-3xl font-bold mb-4">Join Our Culinary Community</h2>
+                <p class="text-lg mb-8">Subscribe to receive weekly recipe inspiration, cooking tips, and exclusive content.</p>
+                <form class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <input type="email" placeholder="Your email address" class="flex-grow py-3 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-highlight text-light-text">
+                    <button type="submit" class="bg-accent text-white font-medium py-3 px-8 rounded-full hover:bg-opacity-90 transition duration-300">
+                        Subscribe
+                    </button>
+                </form>
+                <p class="text-sm mt-4 text-white text-opacity-80">We respect your privacy. Unsubscribe at any time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-card border-t border-light-border dark:border-dark-border pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <h2 class="font-heading font-bold text-primary text-xl">Flavor Vault</h2>
+                    </div>
+                    <p class="text-light-textLight dark:text-dark-textLight mb-4">Discover, cook, and enjoy delicious recipes from around the world.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-pinterest text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-youtube text-lg"></i>
+                        </a>
                     </div>
                 </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Home</a></li>
+                        <li><a href="about.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">About Us</a></li>
+                        <li><a href="contact.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Contact</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-view="favorites">Favorites</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Popular Categories</h3>
+                    <ul class="space-y-2" id="footer-categories">
+                        <!-- Will be populated dynamically -->
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Breakfast">Breakfast</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Vegetarian">Vegetarian</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Dessert">Dessert</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Chicken">Chicken</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Seafood">Seafood</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Pasta">Pasta</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
+                            <span class="text-light-textLight dark:text-dark-textLight">123 Culinary Street, Foodie City, FC 12345</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-primary mr-3"></i>
+                            <a href="mailto:info@flavorvault.com" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">info@flavorvault.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone text-primary mr-3"></i>
+                            <a href="tel:+11234567890" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">+1 (123) 456-7890</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="footer-bottom">
+            
+            <!-- Bottom Footer -->
+            <div class="pt-6 border-t border-light-border dark:border-dark-border text-center text-light-textLight dark:text-dark-textLight text-sm">
                 <p>&copy; 2025 Flavor Vault. All rights reserved.</p>
+                <p class="mt-2">Powered by <a href="https://www.themealdb.com/api.php" target="_blank" class="text-primary hover:underline">TheMealDB API</a></p>
             </div>
         </div>
     </footer>
 
-    <!-- Recipe Template for rendering recipe cards -->
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110 opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Recipe Card Template -->
     <template id="recipe-card-template">
-        <div class="recipe-card">
-            <div class="recipe-image">
-                <img src="/placeholder.svg" alt="">
-                <button class="favorite-btn">♡</button>
+        <div class="recipe-card bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg animate-fade-in animate-slide-up">
+            <div class="relative h-48 overflow-hidden">
+                <img src="/placeholder.svg" alt="" class="w-full h-full object-cover">
+                <button class="favorite-btn absolute top-3 right-3 bg-white bg-opacity-80 hover:bg-white w-9 h-9 rounded-full flex items-center justify-center text-xl">♡</button>
+                <div class="absolute bottom-0 left-0 bg-primary text-white text-xs font-medium py-1 px-2">
+                    <span class="category-tag"></span>
+                </div>
             </div>
-            <div class="recipe-content">
-                <h3 class="recipe-title"></h3>
-                <div class="recipe-meta">
-                    <div class="recipe-category"></div>
-                    <div class="recipe-rating"></div>
+            <div class="p-4">
+                <h3 class="recipe-title font-heading font-bold text-lg mb-2 line-clamp-2 dark:text-dark-text"></h3>
+                <div class="flex justify-between items-center mb-3">
+                    <div class="recipe-rating text-highlight font-medium"></div>
+                    <div class="recipe-time flex items-center text-sm text-light-textLight dark:text-dark-textLight">
+                        <i class="far fa-clock mr-1"></i>
+                        <span class="time-text"></span>
+                    </div>
                 </div>
-                <div class="recipe-time">
-                    <span class="time-icon">⏱</span>
-                    <span class="time-text"></span>
-                </div>
-                <button class="view-recipe-btn">View Recipe</button>
+                <button class="view-recipe-btn w-full bg-primary text-white font-medium py-2 rounded-md hover:bg-opacity-90 transition duration-300">View Recipe</button>
             </div>
         </div>
     </template>
 
+    <!-- Featured Recipe Template -->
+    <template id="featured-recipe-template">
+        <div class="grid grid-cols-1 md:grid-cols-2">
+            <div class="relative h-64 md:h-auto">
+                <img src="/placeholder.svg" alt="" class="w-full h-full object-cover">
+                <div class="absolute top-4 left-4 bg-highlight text-white text-sm font-bold py-1 px-3 rounded-full">
+                    Featured
+                </div>
+                <button class="favorite-btn absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">♡</button>
+            </div>
+            <div class="p-6 md:p-8">
+                <div class="mb-2 text-sm">
+                    <span class="category-tag bg-secondary text-white py-1 px-2 rounded-sm"></span>
+                </div>
+                <h3 class="recipe-title font-heading font-bold text-2xl mb-3 dark:text-dark-text"></h3>
+                <div class="flex items-center mb-4">
+                    <div class="recipe-rating text-highlight font-medium mr-4"></div>
+                    <div class="recipe-time flex items-center text-light-textLight dark:text-dark-textLight">
+                        <i class="far fa-clock mr-1"></i>
+                        <span class="time-text"></span>
+                    </div>
+                </div>
+                <p class="recipe-description text-light-textLight dark:text-dark-textLight mb-6 line-clamp-3"></p>
+                <button class="view-recipe-btn bg-primary text-white font-medium py-3 px-6 rounded-md hover:bg-opacity-90 transition duration-300">
+                    View Full Recipe <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
     <script src="js/api.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/favorites.js"></script>
     <script src="js/darkMode.js"></script>
+    <script src="js/search.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

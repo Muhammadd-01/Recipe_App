@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn about Flavor Vault, our mission, and the team behind your favorite recipe app.">
+    <meta property="og:title" content="About Flavor Vault - Your Culinary Companion">
+    <meta property="og:description" content="Discover the story behind Flavor Vault and our mission to inspire home cooks worldwide.">
+    <meta property="og:image" content="/placeholder.svg?height=630&width=1200">
+    <meta property="og:url" content="https://flavorvault.example.com/about">
+    <meta property="twitter:card" content="summary_large_image">
+    <title>About Us - Flavor Vault</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF8A00', // Orange
+                        secondary: '#4CAF50', // Green
+                        accent: '#8D6E63', // Brown
+                        highlight: '#FFC107', // Yellow
+                        light: {
+                            bg: '#FFF9EB',
+                            card: '#FFFFFF',
+                            text: '#333333',
+                            textLight: '#555555',
+                            border: '#EAEAEA'
+                        },
+                        dark: {
+                            bg: '#2A2A2A',
+                            card: '#3D3D3D',
+                            text: '#F5F5F5',
+                            textLight: '#BDBDBD',
+                            border: '#444444'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['"Playfair Display"', 'serif'],
+                        body: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom Styles -->
+    <style>
+        /* Base animations and transitions */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="font-body bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white dark:bg-dark-card shadow-md">
+        <div class="container mx-auto px-4">
+            <!-- Top Navigation Bar -->
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <h1 class="font-heading font-bold text-primary text-2xl">Flavor Vault</h1>
+                    </a>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="about.html" class="nav-link active">About</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                    <a href="index.html" class="nav-link" data-view="favorites">
+                        <i class="fas fa-heart mr-1"></i> Favorites
+                    </a>
+                    <!-- Theme Toggle -->
+                    <div class="relative">
+                        <input type="checkbox" id="theme-toggle" class="hidden">
+                        <label for="theme-toggle" class="flex items-center justify-between w-12 h-6 bg-accent rounded-full p-1 cursor-pointer">
+                            <span class="text-xs">☀️</span>
+                            <span class="text-xs">🌙</span>
+                            <div class="absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
+                        </label>
+                    </div>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden text-light-text dark:text-dark-text">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="md:hidden hidden pb-4 animate-fade-in">
+                <nav class="flex flex-col space-y-3">
+                    <a href="index.html" class="mobile-nav-link py-2 px-4 rounded">Home</a>
+                    <a href="about.html" class="mobile-nav-link active py-2 px-4 rounded">About</a>
+                    <a href="contact.html" class="mobile-nav-link py-2 px-4 rounded">Contact</a>
+                    <a href="index.html" class="mobile-nav-link py-2 px-4 rounded" data-view="favorites">
+                        <i class="fas fa-heart mr-1"></i> Favorites
+                    </a>
+                    <div class="flex items-center py-2 px-4">
+                        <span class="mr-2">Theme:</span>
+                        <div class="relative">
+                            <input type="checkbox" id="mobile-theme-toggle" class="hidden">
+                            <label for="mobile-theme-toggle" class="flex items-center justify-between w-12 h-6 bg-accent rounded-full p-1 cursor-pointer">
+                                <span class="text-xs">☀️</span>
+                                <span class="text-xs">🌙</span>
+                                <div class="absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
+                            </label>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-primary to-highlight text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="font-heading text-4xl md:text-5xl font-bold mb-4">About Flavor Vault</h1>
+            <p class="text-lg max-w-3xl mx-auto">Discover the story behind your favorite recipe platform and the passionate team making it possible.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="flex-grow py-12">
+        <div class="container mx-auto px-4">
+            <!-- Our Story Section -->
+            <section class="mb-16">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="animate-fade-in">
+                        <h2 class="font-heading text-3xl font-bold mb-4 dark:text-dark-text">Our Story</h2>
+                        <p class="mb-4 text-light-textLight dark:text-dark-textLight">Flavor Vault began in 2020 with a simple mission: to make cooking accessible, enjoyable, and inspiring for everyone. What started as a small collection of family recipes has grown into a comprehensive platform with thousands of recipes from around the world.</p>
+                        <p class="mb-4 text-light-textLight dark:text-dark-textLight">Our founder, Chef Maria Rodriguez, noticed that many people wanted to cook at home but felt intimidated by complex recipes or were stuck in a rut making the same dishes. She created Flavor Vault to break down these barriers and inspire culinary creativity.</p>
+                        <p class="text-light-textLight dark:text-dark-textLight">Today, we're proud to help millions of home cooks discover new flavors, learn techniques, and share their passion for food with others.</p>
+                    </div>
+                    <div class="rounded-xl overflow-hidden shadow-lg animate-fade-in">
+                        <img src="/placeholder.svg?height=600&width=800" alt="Chef cooking in a kitchen" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Our Mission Section -->
+            <section class="mb-16 bg-white dark:bg-dark-card rounded-xl p-8 shadow-lg">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="font-heading text-3xl font-bold mb-6 dark:text-dark-text">Our Mission</h2>
+                    <p class="text-xl italic mb-8 text-light-textLight dark:text-dark-textLight">"To inspire culinary creativity and bring people together through the joy of cooking."</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <div class="p-4">
+                            <div class="bg-light-bg dark:bg-dark-bg rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-lightbulb text-2xl text-primary"></i>
+                            </div>
+                            <h3 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">Inspire</h3>
+                            <p class="text-light-textLight dark:text-dark-textLight">We aim to inspire home cooks with diverse recipes and creative ideas.</p>
+                        </div>
+                        <div class="p-4">
+                            <div class="bg-light-bg dark:bg-dark-bg rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-book-open text-2xl text-primary"></i>
+                            </div>
+                            <h3 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">Educate</h3>
+                            <p class="text-light-textLight dark:text-dark-textLight">We provide clear instructions and cooking knowledge for all skill levels.</p>
+                        </div>
+                        <div class="p-4">
+                            <div class="bg-light-bg dark:bg-dark-bg rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-users text-2xl text-primary"></i>
+                            </div>
+                            <h3 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">Connect</h3>
+                            <p class="text-light-textLight dark:text-dark-textLight">We bring people together through shared culinary experiences.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Meet the Team Section -->
+            <section class="mb-16">
+                <h2 class="font-heading text-3xl font-bold mb-8 text-center dark:text-dark-text">Meet Our Team</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Team Member 1 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                        <div class="h-64 overflow-hidden">
+                            <img src="/placeholder.svg?height=400&width=400" alt="Maria Rodriguez" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-heading font-bold text-lg mb-1 dark:text-dark-text">Maria Rodriguez</h3>
+                            <p class="text-primary font-medium mb-2">Founder & Head Chef</p>
+                            <p class="text-sm text-light-textLight dark:text-dark-textLight mb-4">Former restaurant owner with 15+ years of culinary experience.</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 2 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                        <div class="h-64 overflow-hidden">
+                            <img src="/placeholder.svg?height=400&width=400" alt="David Chen" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-heading font-bold text-lg mb-1 dark:text-dark-text">David Chen</h3>
+                            <p class="text-primary font-medium mb-2">Executive Chef</p>
+                            <p class="text-sm text-light-textLight dark:text-dark-textLight mb-4">Specializes in Asian fusion cuisine with a modern twist.</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 3 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                        <div class="h-64 overflow-hidden">
+                            <img src="/placeholder.svg?height=400&width=400" alt="Sophia Johnson" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-heading font-bold text-lg mb-1 dark:text-dark-text">Sophia Johnson</h3>
+                            <p class="text-primary font-medium mb-2">Food Photographer</p>
+                            <p class="text-sm text-light-textLight dark:text-dark-textLight mb-4">Award-winning photographer capturing the beauty of food.</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Member 4 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                        <div class="h-64 overflow-hidden">
+                            <img src="/placeholder.svg?height=400&width=400" alt="Michael Thompson" class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-heading font-bold text-lg mb-1 dark:text-dark-text">Michael Thompson</h3>
+                            <p class="text-primary font-medium mb-2">Nutritionist</p>
+                            <p class="text-sm text-light-textLight dark:text-dark-textLight mb-4">Ensures our recipes are balanced and nutritionally sound.</p>
+                            <div class="flex justify-center space-x-3">
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="mb-16">
+                <h2 class="font-heading text-3xl font-bold mb-8 text-center dark:text-dark-text">What Our Users Say</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Testimonial 1 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                        <div class="text-highlight text-xl mb-4">★★★★★</div>
+                        <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"Flavor Vault has completely transformed my cooking. The recipes are easy to follow and always delicious. My family can't believe I made these dishes!"</p>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                <img src="/placeholder.svg?height=100&width=100" alt="User" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-medium dark:text-dark-text">Sarah M.</h4>
+                                <p class="text-sm text-light-textLight dark:text-dark-textLight">Home Cook</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 2 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                        <div class="text-highlight text-xl mb-4">★★★★★</div>
+                        <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"As someone who never cooked before, this site has been a lifesaver. The step-by-step instructions and photos make it impossible to mess up!"</p>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                <img src="/placeholder.svg?height=100&width=100" alt="User" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-medium dark:text-dark-text">James T.</h4>
+                                <p class="text-sm text-light-textLight dark:text-dark-textLight">Beginner Cook</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Testimonial 3 -->
+                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                        <div class="text-highlight text-xl mb-4">★★★★★</div>
+                        <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"I love how diverse the recipes are. I've discovered so many international dishes that have become family favorites. The search and filter options make it easy to find exactly what I want."</p>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                <img src="/placeholder.svg?height=100&width=100" alt="User" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h4 class="font-medium dark:text-dark-text">Elena K.</h4>
+                                <p class="text-sm text-light-textLight dark:text-dark-textLight">Culinary Enthusiast</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Call to Action -->
+            <section class="bg-gradient-to-r from-secondary to-primary text-white rounded-xl p-8 text-center">
+                <h2 class="font-heading text-3xl font-bold mb-4">Ready to Start Cooking?</h2>
+                <p class="text-lg mb-6 max-w-2xl mx-auto">Join thousands of home cooks who have discovered the joy of cooking with Flavor Vault.</p>
+                <a href="index.html" class="inline-block bg-white text-primary font-medium py-3 px-8 rounded-full hover:bg-gray-100 transition duration-300">
+                    Explore Recipes
+                </a>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-dark-card border-t border-light-border dark:border-dark-border pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <!-- About -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-utensils text-primary text-2xl mr-2"></i>
+                        <h2 class="font-heading font-bold text-primary text-xl">Flavor Vault</h2>
+                    </div>
+                    <p class="text-light-textLight dark:text-dark-textLight mb-4">Discover, cook, and enjoy delicious recipes from around the world.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-pinterest text-lg"></i>
+                        </a>
+                        <a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                            <i class="fab fa-youtube text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Home</a></li>
+                        <li><a href="about.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">About Us</a></li>
+                        <li><a href="contact.html" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Contact</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-view="favorites">Favorites</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Privacy Policy</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Categories -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Popular Categories</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Breakfast">Breakfast</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Vegetarian">Vegetarian</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Dessert">Dessert</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Chicken">Chicken</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Seafood">Seafood</a></li>
+                        <li><a href="#" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-category="Pasta">Pasta</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="font-heading font-bold text-lg mb-4 dark:text-dark-text">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
+                            <span class="text-light-textLight dark:text-dark-textLight">123 Culinary Street, Foodie City, FC 12345</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-primary mr-3"></i>
+                            <a href="mailto:info@flavorvault.com" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">info@flavorvault.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone text-primary mr-3"></i>
+                            <a href="tel:+11234567890" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">+1 (123) 456-7890</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Bottom Footer -->
+            <div class="pt-6 border-t border-light-border dark:border-dark-border text-center text-light-textLight dark:text-dark-textLight text-sm">
+                <p>&copy; 2025 Flavor Vault. All rights reserved.</p>
+                <p class="mt-2">Powered by <a href="https://www.themealdb.com/api.php" target="_blank" class="text-primary hover:underline">TheMealDB API</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-6 right-6 bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform transition-transform duration-300 hover:scale-110 opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="js/darkMode.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dark mode
+            DarkMode.init();
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.innerHTML = mobileMenu.classList.contains('hidden') 
+                    ? '<i class="fas fa-bars text-2xl"></i>' 
+                    : '<i class="fas fa-times text-2xl"></i>';
+            });
+            
+            // Back to top button
+            const backToTopButton = document.getElementById('back-to-top');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
+                } else {
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                    backToTopButton.classList.add('opacity-0', 'invisible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
