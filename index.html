@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover delicious recipes from around the world with our recipe app. Search, filter, and save your favorite recipes.">
+    <meta property="og:title" content="Flavor Vault - Discover Delicious Recipes">
+    <meta property="og:description" content="Search thousands of recipes, find cooking inspiration, and save your favorites.">
+    <meta property="og:image" content="/placeholder.svg?height=630&width=1200">
+    <meta property="og:url" content="https://flavorvault.example.com">
+    <meta property="twitter:card" content="summary_large_image">
+    <title>Flavor Vault - Discover Delicious Recipes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Recipe Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org/",
+      "@type": "WebSite",
+      "name": "Flavor Vault",
+      "url": "https://flavorvault.example.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://flavorvault.example.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <h1>Flavor Vault</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="active" data-view="home">Home</a></li>
+                    <li><a href="#" data-view="favorites">Favorites</a></li>
+                    <li>
+                        <div class="theme-toggle">
+                            <input type="checkbox" id="theme-toggle" class="theme-toggle-input">
+                            <label for="theme-toggle" class="theme-toggle-label">
+                                <span class="toggle-icon light-icon">☀️</span>
+                                <span class="toggle-icon dark-icon">🌙</span>
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Discover Delicious Recipes</h2>
+                <p>Find inspiration for your next culinary adventure</p>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search recipes or ingredients...">
+                    <button id="search-button">Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="category-filter">
+        <div class="container">
+            <h3>Filter by Category</h3>
+            <div class="filter-buttons" id="category-buttons">
+                <!-- Categories will be dynamically added here -->
+                <button class="filter-btn active" data-category="all">All</button>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <div class="container">
+            <section id="home-view" class="app-view active">
+                <div id="loading-spinner" class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+                <div id="recipes-container" class="recipes-grid">
+                    <!-- Recipe cards will be dynamically added here -->
+                </div>
+            </section>
+
+            <section id="favorites-view" class="app-view">
+                <h2 class="section-title">Your Favorite Recipes</h2>
+                <div id="favorites-container" class="recipes-grid">
+                    <!-- Favorite recipes will be dynamically added here -->
+                </div>
+                <div id="no-favorites" class="no-content">
+                    <p>You haven't saved any favorites yet. Start exploring and save recipes you love!</p>
+                </div>
+            </section>
+
+            <section id="recipe-details-view" class="app-view">
+                <button id="back-button" class="back-button">← Back</button>
+                <article id="recipe-details-container" class="recipe-details">
+                    <!-- Recipe details will be dynamically added here -->
+                </article>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Flavor Vault</h2>
+                    <p>Discover, cook, and enjoy delicious recipes.</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Stay Updated</h3>
+                    <p>Subscribe to our newsletter for new recipes and cooking tips.</p>
+                    <div class="newsletter-form">
+                        <input type="email" placeholder="Your email address">
+                        <button>Subscribe</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Flavor Vault. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Recipe Template for rendering recipe cards -->
+    <template id="recipe-card-template">
+        <div class="recipe-card">
+            <div class="recipe-image">
+                <img src="/placeholder.svg" alt="">
+                <button class="favorite-btn">♡</button>
+            </div>
+            <div class="recipe-content">
+                <h3 class="recipe-title"></h3>
+                <div class="recipe-meta">
+                    <div class="recipe-category"></div>
+                    <div class="recipe-rating"></div>
+                </div>
+                <div class="recipe-time">
+                    <span class="time-icon">⏱</span>
+                    <span class="time-text"></span>
+                </div>
+                <button class="view-recipe-btn">View Recipe</button>
+            </div>
+        </div>
+    </template>
+
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/favorites.js"></script>
+    <script src="js/darkMode.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
