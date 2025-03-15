@@ -3,6 +3,8 @@ import UI from "./ui.js"
 import Favorites from "./favorites.js"
 import DarkMode from "./darkMode.js"
 import Search from "./search.js"
+import MealPlanner from "./mealPlanner.js"
+import RestaurantFinder from "./restaurantFinder.js"
 
 /**
  * Main App Controller
@@ -17,12 +19,21 @@ const App = {
    * Initialize the app
    */
   async init() {
+    // Make API available globally for restaurant finder
+    window.API = API
+
     // Initialize UI and Dark Mode
     UI.init()
     DarkMode.init()
 
     // Initialize Search
     Search.init(API)
+
+    // Initialize Meal Planner
+    MealPlanner.init()
+
+    // Initialize Restaurant Finder
+    RestaurantFinder.init()
 
     // Set up event listeners
     this.setupEventListeners()
@@ -239,9 +250,12 @@ const App = {
 
       // Update category buttons
       document.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.remove("active")
+        btn.classList.remove("active", "bg-primary", "text-white")
+        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+
         if (btn.getAttribute("data-category") === randomCategory) {
-          btn.classList.add("active")
+          btn.classList.add("active", "bg-primary", "text-white")
+          btn.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
         }
       })
 
@@ -326,7 +340,7 @@ const App = {
             content.querySelector(".time-text").textContent = `${featuredRecipe.cookingTime} mins`
 
             // Set recipe description
-            const description = featuredRecipe.instructions.split(".")[0] + "."
+            const description = featuredRecipe.description || featuredRecipe.instructions.split(".")[0] + "."
             content.querySelector(".recipe-description").textContent = description
 
             // Set view recipe button
@@ -476,9 +490,12 @@ const App = {
 
       // Update category buttons
       document.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.remove("active")
+        btn.classList.remove("active", "bg-primary", "text-white")
+        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+
         if (btn.getAttribute("data-category") === category) {
-          btn.classList.add("active")
+          btn.classList.add("active", "bg-primary", "text-white")
+          btn.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
         }
       })
     } catch (error) {
@@ -523,9 +540,12 @@ const App = {
 
       // Reset category buttons
       document.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.remove("active")
+        btn.classList.remove("active", "bg-primary", "text-white")
+        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+
         if (btn.getAttribute("data-category") === "all") {
-          btn.classList.add("active")
+          btn.classList.add("active", "bg-primary", "text-white")
+          btn.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
         }
       })
     } catch (error) {
