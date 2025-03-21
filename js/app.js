@@ -1389,7 +1389,116 @@ function initSocialSharing() {
   }
 }
 
-// Initialize all new features
+// Add this at the end of the file, just before the DOMContentLoaded event listener
+
+// Show modals when buttons are clicked
+function setupModalTriggers() {
+  // User account modal triggers
+  const userAccountBtn = document.getElementById("user-account-btn")
+  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
+  const loginModal = document.getElementById("login-modal")
+
+  if (userAccountBtn && loginModal) {
+    userAccountBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  if (mobileUserAccountBtn && loginModal) {
+    mobileUserAccountBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Shopping list modal trigger
+  const shoppingListBtn = document.getElementById("shopping-list-btn")
+  const shoppingListModal = document.getElementById("shopping-list-modal")
+
+  if (shoppingListBtn && shoppingListModal) {
+    shoppingListBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      shoppingListModal.classList.remove("hidden")
+    })
+  }
+
+  // Add shopping list button to header
+  const navLinks = document.querySelector('.nav-link[data-view="favorites"]')
+  if (navLinks && !document.getElementById("shopping-list-btn")) {
+    const shoppingListNavLink = document.createElement("a")
+    shoppingListNavLink.href = "#"
+    shoppingListNavLink.id = "shopping-list-btn"
+    shoppingListNavLink.className = "nav-link"
+    shoppingListNavLink.innerHTML = '<i class="fas fa-shopping-basket mr-1"></i> Shopping List'
+    navLinks.parentNode.insertBefore(shoppingListNavLink, navLinks.nextSibling)
+
+    shoppingListNavLink.addEventListener("click", (e) => {
+      e.preventDefault()
+      if (shoppingListModal) {
+        shoppingListModal.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Add mobile shopping list button
+  const mobileNavLinks = document.querySelector('.mobile-nav-link[data-view="favorites"]')
+  if (mobileNavLinks && !document.getElementById("mobile-shopping-list-btn")) {
+    const mobileShoppingListNavLink = document.createElement("a")
+    mobileShoppingListNavLink.href = "#"
+    mobileShoppingListNavLink.id = "mobile-shopping-list-btn"
+    mobileShoppingListNavLink.className = "mobile-nav-link py-2 px-4 rounded"
+    mobileShoppingListNavLink.innerHTML = '<i class="fas fa-shopping-basket mr-1"></i> Shopping List'
+    mobileNavLinks.parentNode.insertBefore(mobileShoppingListNavLink, mobileNavLinks.nextSibling)
+
+    mobileShoppingListNavLink.addEventListener("click", (e) => {
+      e.preventDefault()
+      if (shoppingListModal) {
+        shoppingListModal.classList.remove("hidden")
+      }
+    })
+  }
+
+  // Recipe submission modal trigger
+  const submitRecipeBtn = document.createElement("a")
+  submitRecipeBtn.href = "#"
+  submitRecipeBtn.id = "submit-recipe-btn"
+  submitRecipeBtn.className = "nav-link"
+  submitRecipeBtn.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Submit Recipe'
+
+  if (navLinks) {
+    navLinks.parentNode.insertBefore(submitRecipeBtn, navLinks.nextSibling.nextSibling)
+  }
+
+  const submitRecipeModal = document.getElementById("submit-recipe-modal")
+
+  if (submitRecipeBtn && submitRecipeModal) {
+    submitRecipeBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      submitRecipeModal.classList.remove("hidden")
+    })
+  }
+
+  // Add mobile submit recipe button
+  const mobileSubmitRecipeBtn = document.createElement("a")
+  mobileSubmitRecipeBtn.href = "#"
+  mobileSubmitRecipeBtn.id = "mobile-submit-recipe-btn"
+  mobileSubmitRecipeBtn.className = "mobile-nav-link py-2 px-4 rounded"
+  mobileSubmitRecipeBtn.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Submit Recipe'
+
+  if (mobileNavLinks) {
+    mobileNavLinks.parentNode.insertBefore(mobileSubmitRecipeBtn, mobileNavLinks.nextSibling.nextSibling)
+  }
+
+  if (mobileSubmitRecipeBtn && submitRecipeModal) {
+    mobileSubmitRecipeBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      submitRecipeModal.classList.remove("hidden")
+    })
+  }
+}
+
+// Replace the existing DOMContentLoaded event listener with this one
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize existing features
   App.init()
@@ -1400,5 +1509,24 @@ document.addEventListener("DOMContentLoaded", () => {
   initRecipeSubmission()
   initRecipeRating()
   initSocialSharing()
+
+  // Setup modal triggers
+  setupModalTriggers()
+
+  // Fix dark mode toggle
+  const themeToggle = document.getElementById("theme-toggle")
+  const mobileThemeToggle = document.getElementById("mobile-theme-toggle")
+
+  if (themeToggle) {
+    themeToggle.checked = DarkMode.isDarkMode()
+    DarkMode.updateToggleAppearance(themeToggle)
+  }
+
+  if (mobileThemeToggle) {
+    mobileThemeToggle.checked = DarkMode.isDarkMode()
+    DarkMode.updateToggleAppearance(mobileThemeToggle)
+  }
+
+  console.log("App fully initialized")
 })
 

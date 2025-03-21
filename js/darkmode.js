@@ -52,6 +52,9 @@ const DarkMode = {
         })
       }
     })
+
+    // Debug log
+    console.log("DarkMode initialized, current state:", this.isDarkMode())
   },
 
   /**
@@ -165,6 +168,9 @@ const DarkMode = {
         detail: { isDarkMode: this.isDarkMode() },
       }),
     )
+
+    // Debug log
+    console.log("Theme toggled, new state:", this.isDarkMode())
   },
 
   /**
