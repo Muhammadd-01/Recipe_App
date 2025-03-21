@@ -114,6 +114,9 @@ const UI = {
       }
     })
 
+    // Meal planner modal
+    this.setupModalTrigger("add-to-meal-plan-btn", "add-meal-plan-modal")
+
     // Toggle dark mode button
     const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
     if (toggleDarkModeBtn) {

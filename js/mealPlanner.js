@@ -2,546 +2,1105 @@
  * Meal Planner functionality
  */
 const MealPlanner = {
-    storageKey: "recipe-app-meal-plan",
-  
-    /**
-     * Initialize meal planner
-     */
-    init() {
-      this.setupEventListeners()
-      this.loadMealPlan()
-    },
-  
-    /**
-     * Set up event listeners
-     */
-    setupEventListeners() {
-      // Add to meal plan buttons
-      document.addEventListener("click", (e) => {
-        if (e.target.classList.contains("add-to-plan-btn") || e.target.closest(".add-to-plan-btn")) {
-          const button = e.target.classList.contains("add-to-plan-btn") ? e.target : e.target.closest(".add-to-plan-btn")
-  
-          const recipeId = button.getAttribute("data-recipe-id")
-          const recipeName = button.getAttribute("data-recipe-name")
-          const recipeImage = button.getAttribute("data-recipe-image")
-  
-          if (recipeId && recipeName) {
-            this.showAddToPlanModal(recipeId, recipeName, recipeImage)
-          }
+  storageKey: "recipe-app-meal-plan",
+
+  /**
+   * Initialize meal planner
+   */
+  init() {
+    // Set up event listeners
+    this.setupEventListeners()
+
+    // Load meal plan data from localStorage
+    this.loadMealPlan()
+
+    console.log("Meal Planner initialized")
+  },
+
+  /**
+   * Set up event listeners
+   */
+  setupEventListeners() {
+    // Add to meal plan buttons
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("add-to-plan-btn") || e.target.closest(".add-to-plan-btn")) {
+        const button = e.target.classList.contains("add-to-plan-btn") ? e.target : e.target.closest(".add-to-plan-btn")
+
+        const recipeId = button.getAttribute("data-recipe-id")
+        const recipeName = button.getAttribute("data-recipe-name")
+        const recipeImage = button.getAttribute("data-recipe-image")
+
+        if (recipeId && recipeName) {
+          this.showAddToPlanModal(recipeId, recipeName, recipeImage)
         }
-      })
-  
-      // Close modal when clicking outside
-      document.addEventListener("click", (e) => {
-        const modal = document.getElementById("meal-plan-modal")
-        if (modal && e.target === modal) {
-          this.closeModal()
-        }
-      })
-  
-      // Close modal with escape key
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          this.closeModal()
-        }
-      })
-    },
-  
-    /**
-     * Show modal to add recipe to meal plan
-     * @param {string} recipeId - Recipe ID
-     * @param {string} recipeName - Recipe name
-     * @param {string} recipeImage - Recipe image URL
-     */
-    showAddToPlanModal(recipeId, recipeName, recipeImage) {
-      // Create modal if it doesn't exist
-      let modal = document.getElementById("meal-plan-modal")
-  
-      if (!modal) {
-        modal = document.createElement("div")
-        modal.id = "meal-plan-modal"
-        modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-        document.body.appendChild(modal)
       }
-  
-      // Get current date and next 7 days
-      const days = this.getNextSevenDays()
-  
-      // Create modal content
-      modal.innerHTML = `
-              <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
-                  <div class="flex justify-between items-center mb-4">
-                      <h3 class="font-heading text-xl font-bold dark:text-dark-text">Add to Meal Plan</h3>
-                      <button id="close-modal-btn" class="text-light-textLight dark:text-dark-textLight hover:text-primary">
-                          <i class="fas fa-times text-xl"></i>
-                      </button>
-                  </div>
-                  
-                  <div class="flex items-center mb-6">
-                      <img src="${recipeImage || "/placeholder.svg?height=80&width=80"}" alt="${recipeName}" 
-                          class="w-16 h-16 rounded-md object-cover mr-4">
-                      <div>
-                          <h4 class="font-medium dark:text-dark-text">${recipeName}</h4>
-                          <p class="text-sm text-light-textLight dark:text-dark-textLight">Select day and meal type</p>
-                      </div>
-                  </div>
-                  
-                  <div class="mb-4">
-                      <label class="block mb-2 font-medium dark:text-dark-text">Day</label>
-                      <select id="meal-plan-day" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
-                          ${days
-                            .map(
-                              (day) => `
-                              <option value="${day.value}">${day.label}</option>
-                          `,
-                            )
-                            .join("")}
-                      </select>
-                  </div>
-                  
-                  <div class="mb-6">
-                      <label class="block mb-2 font-medium dark:text-dark-text">Meal Type</label>
-                      <select id="meal-plan-type" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
-                          <option value="breakfast">Breakfast</option>
-                          <option value="lunch">Lunch</option>
-                          <option value="dinner">Dinner</option>
-                          <option value="snack">Snack</option>
-                      </select>
-                  </div>
-                  
-                  <div class="flex justify-end">
-                      <button id="cancel-plan-btn" class="px-4 py-2 mr-2 border border-light-border dark:border-dark-border rounded-md">
-                          Cancel
-                      </button>
-                      <button id="add-to-plan-confirm-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition duration-300">
-                          Add to Plan
-                      </button>
-                  </div>
-              </div>
-          `
-  
-      // Show modal
-      modal.style.display = "flex"
-  
-      // Add event listeners
-      document.getElementById("close-modal-btn").addEventListener("click", () => {
-        this.closeModal()
-      })
-  
-      document.getElementById("cancel-plan-btn").addEventListener("click", () => {
-        this.closeModal()
-      })
-  
-      document.getElementById("add-to-plan-confirm-btn").addEventListener("click", () => {
-        const day = document.getElementById("meal-plan-day").value
-        const mealType = document.getElementById("meal-plan-type").value
-  
-        this.addToPlan(recipeId, recipeName, recipeImage, day, mealType)
-        this.closeModal()
-  
-        // Show success message
-        this.showNotification("Recipe added to your meal plan!")
-      })
-    },
-  
-    /**
-     * Close the modal
-     */
-    closeModal() {
+    })
+
+    // Close modal when clicking outside
+    document.addEventListener("click", (e) => {
       const modal = document.getElementById("meal-plan-modal")
-      if (modal) {
-        modal.style.display = "none"
+      if (modal && e.target === modal) {
+        this.closeModal()
       }
-    },
-  
-    /**
-     * Show notification message
-     * @param {string} message - Message to display
-     */
-    showNotification(message) {
-      // Create notification if it doesn't exist
-      let notification = document.getElementById("notification")
-  
-      if (!notification) {
-        notification = document.createElement("div")
-        notification.id = "notification"
-        notification.className =
-          "fixed bottom-4 right-4 bg-secondary text-white px-4 py-2 rounded-md shadow-lg transform transition-transform duration-300 translate-y-20 z-50"
-        document.body.appendChild(notification)
+    })
+
+    // Close modal with escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        this.closeModal()
       }
-  
-      // Set message
-      notification.textContent = message
-  
-      // Show notification
-      setTimeout(() => {
-        notification.classList.remove("translate-y-20")
-      }, 100)
-  
-      // Hide notification after 3 seconds
-      setTimeout(() => {
-        notification.classList.add("translate-y-20")
-      }, 3000)
-    },
-  
-    /**
-     * Get next seven days for meal planning
-     * @returns {Array} - Array of day objects with value and label
-     */
-    getNextSevenDays() {
-      const days = []
-      const today = new Date()
-  
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(today)
-        date.setDate(today.getDate() + i)
-  
-        const value = this.formatDateValue(date)
-        let label = ""
-  
-        if (i === 0) {
-          label = "Today"
-        } else if (i === 1) {
-          label = "Tomorrow"
-        } else {
-          label = date.toLocaleDateString("en-US", { weekday: "long" })
-        }
-  
-        label += ` (${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })})`
-  
-        days.push({ value, label })
-      }
-  
-      return days
-    },
-  
-    /**
-     * Format date as YYYY-MM-DD for storage
-     * @param {Date} date - Date object
-     * @returns {string} - Formatted date string
-     */
-    formatDateValue(date) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-    },
-  
-    /**
-     * Add recipe to meal plan
-     * @param {string} recipeId - Recipe ID
-     * @param {string} recipeName - Recipe name
-     * @param {string} recipeImage - Recipe image URL
-     * @param {string} day - Day value (YYYY-MM-DD)
-     * @param {string} mealType - Meal type (breakfast, lunch, dinner, snack)
-     */
-    addToPlan(recipeId, recipeName, recipeImage, day, mealType) {
-      const mealPlan = this.getMealPlan()
-  
-      // Initialize day if it doesn't exist
-      if (!mealPlan[day]) {
-        mealPlan[day] = {}
-      }
-  
-      // Add recipe to meal plan
-      mealPlan[day][mealType] = {
-        id: recipeId,
-        name: recipeName,
-        image: recipeImage,
-      }
-  
-      // Save meal plan
-      localStorage.setItem(this.storageKey, JSON.stringify(mealPlan))
-  
-      // Update meal plan display if visible
-      this.updateMealPlanDisplay()
-    },
-  
-    /**
-     * Remove recipe from meal plan
-     * @param {string} day - Day value (YYYY-MM-DD)
-     * @param {string} mealType - Meal type (breakfast, lunch, dinner, snack)
-     */
-    removeFromPlan(day, mealType) {
-      const mealPlan = this.getMealPlan()
-  
-      // Remove recipe from meal plan
-      if (mealPlan[day] && mealPlan[day][mealType]) {
-        delete mealPlan[day][mealType]
-  
-        // Remove day if empty
-        if (Object.keys(mealPlan[day]).length === 0) {
-          delete mealPlan[day]
-        }
-  
-        // Save meal plan
-        localStorage.setItem(this.storageKey, JSON.stringify(mealPlan))
-  
-        // Update meal plan display
-        this.updateMealPlanDisplay()
-      }
-    },
-  
-    /**
-     * Get meal plan from localStorage
-     * @returns {Object} - Meal plan object
-     */
-    getMealPlan() {
-      const mealPlan = localStorage.getItem(this.storageKey)
-      return mealPlan ? JSON.parse(mealPlan) : {}
-    },
-  
-    /**
-     * Load meal plan and render it
-     */
-    loadMealPlan() {
-      const mealPlanContainer = document.getElementById("meal-plan-container")
-      if (mealPlanContainer) {
-        this.renderMealPlan(mealPlanContainer)
-      }
-    },
-  
-    /**
-     * Update meal plan display if visible
-     */
-    updateMealPlanDisplay() {
-      const mealPlanContainer = document.getElementById("meal-plan-container")
-      if (mealPlanContainer && mealPlanContainer.offsetParent !== null) {
-        this.renderMealPlan(mealPlanContainer)
-      }
-    },
-  
-    /**
-     * Render meal plan in container
-     * @param {HTMLElement} container - Container element
-     */
-    renderMealPlan(container) {
-      const mealPlan = this.getMealPlan()
-      const days = this.getNextSevenDays()
-  
-      // Check if meal plan is empty
-      const isEmpty = Object.keys(mealPlan).length === 0
-  
-      if (isEmpty) {
-        container.innerHTML = `
-                  <div class="text-center py-8">
-                      <i class="fas fa-calendar-alt text-5xl text-light-textLight dark:text-dark-textLight mb-4"></i>
-                      <p class="text-lg text-light-textLight dark:text-dark-textLight mb-2">Your meal plan is empty</p>
-                      <p class="text-light-textLight dark:text-dark-textLight mb-6">Add recipes to your meal plan to get started</p>
-                  </div>
-              `
-        return
-      }
-  
-      // Create meal plan table
-      let html = `
-              <div class="overflow-x-auto">
-                  <table class="w-full border-collapse">
-                      <thead>
-                          <tr>
-                              <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Day</th>
-                              <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Breakfast</th>
-                              <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Lunch</th>
-                              <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Dinner</th>
-                              <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Snack</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-          `
-  
-      // Add rows for each day
-      days.forEach((day) => {
-        const dayData = mealPlan[day.value] || {}
-  
-        html += `
-                  <tr class="border-b border-light-border dark:border-dark-border">
-                      <td class="py-3 px-4 font-medium dark:text-dark-text">${day.label}</td>
-                      ${this.renderMealCell(dayData.breakfast, day.value, "breakfast")}
-                      ${this.renderMealCell(dayData.lunch, day.value, "lunch")}
-                      ${this.renderMealCell(dayData.dinner, day.value, "dinner")}
-                      ${this.renderMealCell(dayData.snack, day.value, "snack")}
-                  </tr>
-              `
+    })
+
+    // Add to meal plan button in Meal Planner view
+    const addToMealPlanBtn = document.getElementById("add-to-meal-plan-btn")
+    if (addToMealPlanBtn) {
+      addToMealPlanBtn.addEventListener("click", () => {
+        this.openAddMealPlanModal()
       })
-  
-      html += `
-                      </tbody>
-                  </table>
-              </div>
-              <div class="mt-6 flex justify-end">
-                  <button id="print-meal-plan-btn" class="flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300 mr-4">
-                      <i class="fas fa-print mr-2"></i> Print Meal Plan
-                  </button>
-                  <button id="clear-meal-plan-btn" class="flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                      <i class="fas fa-trash-alt mr-2"></i> Clear Meal Plan
-                  </button>
-              </div>
-          `
-  
-      container.innerHTML = html
-  
-      // Add event listeners
-      document.getElementById("print-meal-plan-btn").addEventListener("click", () => {
-        this.printMealPlan()
-      })
-  
-      document.getElementById("clear-meal-plan-btn").addEventListener("click", () => {
+    }
+
+    // Clear meal plan button
+    const clearMealPlanBtn = document.getElementById("clear-meal-plan-btn")
+    if (clearMealPlanBtn) {
+      clearMealPlanBtn.addEventListener("click", () => {
         if (confirm("Are you sure you want to clear your meal plan?")) {
           this.clearMealPlan()
         }
       })
-  
-      // Add event listeners to remove buttons
-      document.querySelectorAll(".remove-meal-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-          const day = button.getAttribute("data-day")
-          const mealType = button.getAttribute("data-meal-type")
-          this.removeFromPlan(day, mealType)
-        })
+    }
+
+    // Print meal plan button
+    const printMealPlanBtn = document.getElementById("print-meal-plan-btn")
+    if (printMealPlanBtn) {
+      printMealPlanBtn.addEventListener("click", () => {
+        this.printMealPlan()
       })
-    },
-  
-    /**
-     * Render a meal cell for the meal plan table
-     * @param {Object} meal - Meal object
-     * @param {string} day - Day value
-     * @param {string} mealType - Meal type
-     * @returns {string} - HTML for meal cell
-     */
-    renderMealCell(meal, day, mealType) {
-      if (!meal) {
-        return `<td class="py-3 px-4 text-light-textLight dark:text-dark-textLight italic">Not planned</td>`
+    }
+
+    // Generate shopping list button
+    const generateShoppingListBtn = document.getElementById("generate-shopping-list-btn")
+    if (generateShoppingListBtn) {
+      generateShoppingListBtn.addEventListener("click", () => {
+        this.generateShoppingList()
+      })
+    }
+
+    // Close add meal plan modal button
+    const closeAddMealPlanModalBtn = document.getElementById("close-add-meal-plan-modal-btn")
+    if (closeAddMealPlanModalBtn) {
+      closeAddMealPlanModalBtn.addEventListener("click", () => {
+        this.closeAddMealPlanModal()
+      })
+    }
+
+    // Add meal plan form
+    const addMealPlanForm = document.getElementById("add-meal-plan-form")
+    if (addMealPlanForm) {
+      addMealPlanForm.addEventListener("submit", (e) => {
+        e.preventDefault()
+        this.handleAddMealPlan()
+      })
+    }
+
+    // Meal planner navigation link
+    const mealPlannerLinks = document.querySelectorAll(
+      '.nav-link[data-view="meal-planner"], .mobile-nav-link[data-view="meal-planner"]',
+    )
+    mealPlannerLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault()
+        if (window.UI) {
+          window.UI.showView("meal-planner")
+          window.UI.updateActiveNavLink("meal-planner")
+        }
+      })
+    })
+
+    // Show meal planner button
+    const showMealPlannerBtn = document.getElementById("show-meal-planner-btn")
+    if (showMealPlannerBtn) {
+      showMealPlannerBtn.addEventListener("click", () => {
+        if (window.UI) {
+          window.UI.showView("meal-planner")
+          window.UI.updateActiveNavLink("meal-planner")
+        }
+      })
+    }
+
+    // Add event listeners to meal placeholders
+    this.setupMealPlaceholders()
+  },
+
+  /**
+   * Set up meal placeholders
+   */
+  setupMealPlaceholders() {
+    const mealPlaceholders = document.querySelectorAll(".meal-placeholder")
+
+    mealPlaceholders.forEach((placeholder) => {
+      placeholder.addEventListener("click", () => {
+        this.openAddMealPlanModal()
+
+        // Set day and meal type based on the clicked placeholder
+        const dayCard = placeholder.closest(".day-card")
+        const day = dayCard.querySelector("h4").textContent.toLowerCase()
+
+        const mealSlot = placeholder.closest(".meal-slot")
+        const mealType = mealSlot.querySelector("h5").textContent.toLowerCase()
+
+        const daySelect = document.getElementById("meal-day-select")
+        const mealTypeSelect = document.getElementById("meal-type-select")
+
+        if (daySelect) {
+          const dayOption = Array.from(daySelect.options).find((option) => option.text.toLowerCase() === day)
+          if (dayOption) {
+            daySelect.value = dayOption.value
+          }
+        }
+
+        if (mealTypeSelect) {
+          const mealOption = Array.from(mealTypeSelect.options).find((option) => option.text.toLowerCase() === mealType)
+          if (mealOption) {
+            mealTypeSelect.value = mealOption.value
+          }
+        }
+      })
+    })
+  },
+
+  /**
+   * Show modal to add recipe to meal plan
+   * @param {string} recipeId - Recipe ID
+   * @param {string} recipeName - Recipe name
+   * @param {string} recipeImage - Recipe image URL
+   */
+  showAddToPlanModal(recipeId, recipeName, recipeImage) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById("meal-plan-modal")
+
+    if (!modal) {
+      modal = document.createElement("div")
+      modal.id = "meal-plan-modal"
+      modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      document.body.appendChild(modal)
+    }
+
+    // Get current date and next 7 days
+    const days = this.getNextSevenDays()
+
+    // Create modal content
+    modal.innerHTML = `
+            <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-heading text-xl font-bold dark:text-dark-text">Add to Meal Plan</h3>
+                    <button id="close-modal-btn" class="text-light-textLight dark:text-dark-textLight hover:text-primary">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="flex items-center mb-6">
+                    <img src="${recipeImage || "/placeholder.svg?height=80&width=80"}" alt="${recipeName}" 
+                        class="w-16 h-16 rounded-md object-cover mr-4">
+                    <div>
+                        <h4 class="font-medium dark:text-dark-text">${recipeName}</h4>
+                        <p class="text-sm text-light-textLight dark:text-dark-textLight">Select day and meal type</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium dark:text-dark-text">Day</label>
+                    <select id="meal-plan-day" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
+                        ${days
+                          .map(
+                            (day) => `
+                            <option value="${day.value}">${day.label}</option>
+                        `,
+                          )
+                          .join("")}
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 font-medium dark:text-dark-text">Meal Type</label>
+                    <select id="meal-plan-type" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text">
+                        <option value="breakfast">Breakfast</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                        <option value="snack">Snack</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button id="cancel-plan-btn" class="px-4 py-2 mr-2 border border-light-border dark:border-dark-border rounded-md">
+                        Cancel
+                    </button>
+                    <button id="add-to-plan-confirm-btn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition duration-300">
+                        Add to Plan
+                    </button>
+                </div>
+            </div>
+        `
+
+    // Show modal
+    modal.style.display = "flex"
+
+    // Add event listeners
+    document.getElementById("close-modal-btn").addEventListener("click", () => {
+      this.closeModal()
+    })
+
+    document.getElementById("cancel-plan-btn").addEventListener("click", () => {
+      this.closeModal()
+    })
+
+    document.getElementById("add-to-plan-confirm-btn").addEventListener("click", () => {
+      const day = document.getElementById("meal-plan-day").value
+      const mealType = document.getElementById("meal-plan-type").value
+
+      this.addToPlan(recipeId, recipeName, recipeImage, day, mealType)
+      this.closeModal()
+
+      // Show success message
+      this.showNotification("Recipe added to your meal plan!")
+    })
+  },
+
+  /**
+   * Open add meal plan modal
+   */
+  openAddMealPlanModal() {
+    const modal = document.getElementById("add-meal-plan-modal")
+    if (modal) {
+      // Populate recipe select options
+      this.populateRecipeOptions()
+
+      modal.classList.remove("hidden")
+    }
+  },
+
+  /**
+   * Close add meal plan modal
+   */
+  closeAddMealPlanModal() {
+    const modal = document.getElementById("add-meal-plan-modal")
+    if (modal) {
+      modal.classList.add("hidden")
+
+      // Reset form
+      const form = document.getElementById("add-meal-plan-form")
+      if (form) {
+        form.reset()
       }
-  
-      return `
-              <td class="py-3 px-4">
-                  <div class="flex items-center">
-                      <img src="${meal.image || "/placeholder.svg?height=40&width=40"}" alt="${meal.name}" 
-                          class="w-10 h-10 rounded-md object-cover mr-3">
-                      <div class="flex-1">
-                          <div class="font-medium dark:text-dark-text">${meal.name}</div>
-                          <button class="remove-meal-btn text-xs text-primary hover:underline" 
-                              data-day="${day}" data-meal-type="${mealType}">
-                              Remove
-                          </button>
-                      </div>
-                  </div>
-              </td>
-          `
-    },
-  
-    /**
-     * Print meal plan
-     */
-    printMealPlan() {
-      const mealPlan = this.getMealPlan()
-      const days = this.getNextSevenDays()
-  
-      const printWindow = window.open("", "_blank")
-  
-      printWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                  <title>Meal Plan - Flavor Vault</title>
-                  <style>
-                      body {
-                          font-family: Arial, sans-serif;
-                          line-height: 1.6;
-                          max-width: 800px;
-                          margin: 0 auto;
-                          padding: 20px;
-                      }
-                      h1 {
-                          font-size: 24px;
-                          margin-bottom: 20px;
-                          text-align: center;
-                      }
-                      table {
-                          width: 100%;
-                          border-collapse: collapse;
-                          margin-bottom: 30px;
-                      }
-                      th, td {
-                          border: 1px solid #ddd;
-                          padding: 10px;
-                          text-align: left;
-                      }
-                      th {
-                          background-color: #f5f5f5;
-                          font-weight: bold;
-                      }
-                      .meal-name {
-                          font-weight: bold;
-                      }
-                      .empty-meal {
-                          font-style: italic;
-                          color: #999;
-                      }
-                      .footer {
-                          margin-top: 30px;
-                          font-size: 12px;
-                          color: #666;
-                          text-align: center;
-                      }
-                  </style>
-              </head>
-              <body>
-                  <h1>Your Meal Plan</h1>
-                  <table>
-                      <thead>
-                          <tr>
-                              <th>Day</th>
-                              <th>Breakfast</th>
-                              <th>Lunch</th>
-                              <th>Dinner</th>
-                              <th>Snack</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-          `)
-  
-      days.forEach((day) => {
-        const dayData = mealPlan[day.value] || {}
-  
-        printWindow.document.write(`
-                  <tr>
-                      <td>${day.label}</td>
-                      <td>${dayData.breakfast ? `<div class="meal-name">${dayData.breakfast.name}</div>` : '<div class="empty-meal">Not planned</div>'}</td>
-                      <td>${dayData.lunch ? `<div class="meal-name">${dayData.lunch.name}</div>` : '<div class="empty-meal">Not planned</div>'}</td>
-                      <td>${dayData.dinner ? `<div class="meal-name">${dayData.dinner.name}</div>` : '<div class="empty-meal">Not planned</div>'}</td>
-                      <td>${dayData.snack ? `<div class="meal-name">${dayData.snack.name}</div>` : '<div class="empty-meal">Not planned</div>'}</td>
-                  </tr>
-              `)
+    }
+  },
+
+  /**
+   * Populate recipe options
+   */
+  populateRecipeOptions() {
+    const recipeSelect = document.getElementById("meal-recipe-select")
+    if (!recipeSelect) return
+
+    // Clear existing options except the first one
+    while (recipeSelect.options.length > 1) {
+      recipeSelect.remove(1)
+    }
+
+    // Get recipes from favorites
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
+
+    // Get recent search results
+    const recentRecipes = JSON.parse(localStorage.getItem("recent-recipes") || "[]")
+
+    // Combine and remove duplicates
+    const recipes = [...favorites]
+
+    recentRecipes.forEach((recipe) => {
+      if (!recipes.some((r) => r.id === recipe.id)) {
+        recipes.push(recipe)
+      }
+    })
+
+    // Add recipe options
+    recipes.forEach((recipe) => {
+      const option = document.createElement("option")
+      option.value = JSON.stringify(recipe)
+      option.textContent = recipe.name
+      recipeSelect.appendChild(option)
+    })
+
+    // If no recipes, add a message
+    if (recipes.length === 0) {
+      const option = document.createElement("option")
+      option.value = ""
+      option.textContent = "No recipes available. Add some favorites first!"
+      option.disabled = true
+      recipeSelect.appendChild(option)
+    }
+  },
+
+  /**
+   * Handle add meal plan
+   */
+  handleAddMealPlan() {
+    const recipeSelect = document.getElementById("meal-recipe-select")
+    const daySelect = document.getElementById("meal-day-select")
+    const mealTypeSelect = document.getElementById("meal-type-select")
+    const mealNotes = document.getElementById("meal-notes")
+
+    if (!recipeSelect || !daySelect || !mealTypeSelect) return
+
+    const recipeValue = recipeSelect.value
+    const day = daySelect.value
+    const mealType = mealTypeSelect.value
+    const notes = mealNotes?.value || ""
+
+    if (!recipeValue || !day || !mealType) {
+      alert("Please select a recipe, day, and meal type")
+      return
+    }
+
+    // Parse recipe data
+    let recipe
+    try {
+      recipe = JSON.parse(recipeValue)
+    } catch (error) {
+      console.error("Error parsing recipe data:", error)
+      alert("Invalid recipe data")
+      return
+    }
+
+    // Get meal plan data
+    const mealPlan = JSON.parse(localStorage.getItem("meal-plan") || "{}")
+
+    // Initialize day if it doesn't exist
+    if (!mealPlan[day]) {
+      mealPlan[day] = {}
+    }
+
+    // Add meal
+    mealPlan[day][mealType] = {
+      recipe,
+      notes,
+    }
+
+    // Save meal plan
+    localStorage.setItem("meal-plan", JSON.stringify(mealPlan))
+
+    // Close modal
+    this.closeAddMealPlanModal()
+
+    // Update UI
+    this.loadMealPlan()
+
+    // Show success message
+    alert("Recipe added to meal plan!")
+  },
+
+  /**
+   * Close the modal
+   */
+  closeModal() {
+    const modal = document.getElementById("meal-plan-modal")
+    if (modal) {
+      modal.style.display = "none"
+    }
+  },
+
+  /**
+   * Show notification message
+   * @param {string} message - Message to display
+   */
+  showNotification(message) {
+    // Create notification if it doesn't exist
+    let notification = document.getElementById("notification")
+
+    if (!notification) {
+      notification = document.createElement("div")
+      notification.id = "notification"
+      notification.className =
+        "fixed bottom-4 right-4 bg-secondary text-white px-4 py-2 rounded-md shadow-lg transform transition-transform duration-300 translate-y-20 z-50"
+      document.body.appendChild(notification)
+    }
+
+    // Set message
+    notification.textContent = message
+
+    // Show notification
+    setTimeout(() => {
+      notification.classList.remove("translate-y-20")
+    }, 100)
+
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+      notification.classList.add("translate-y-20")
+    }, 3000)
+  },
+
+  /**
+   * Get next seven days for meal planning
+   * @returns {Array} - Array of day objects with value and label
+   */
+  getNextSevenDays() {
+    const days = []
+    const today = new Date()
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today)
+      date.setDate(today.getDate() + i)
+
+      const value = this.formatDateValue(date)
+      let label = ""
+
+      if (i === 0) {
+        label = "Today"
+      } else if (i === 1) {
+        label = "Tomorrow"
+      } else {
+        label = date.toLocaleDateString("en-US", { weekday: "long" })
+      }
+
+      label += ` (${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })})`
+
+      days.push({ value, label })
+    }
+
+    return days
+  },
+
+  /**
+   * Format date as YYYY-MM-DD for storage
+   * @param {Date} date - Date object
+   * @returns {string} - Formatted date string
+   */
+  formatDateValue(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+  },
+
+  /**
+   * Add recipe to meal plan
+   * @param {string} recipeId - Recipe ID
+   * @param {string} recipeName - Recipe name
+   * @param {string} recipeImage - Recipe image URL
+   * @param {string} day - Day value (YYYY-MM-DD)
+   * @param {string} mealType - Meal type (breakfast, lunch, dinner, snack)
+   */
+  addToPlan(recipeId, recipeName, recipeImage, day, mealType) {
+    const mealPlan = this.getMealPlan()
+
+    // Initialize day if it doesn't exist
+    if (!mealPlan[day]) {
+      mealPlan[day] = {}
+    }
+
+    // Add recipe to meal plan
+    mealPlan[day][mealType] = {
+      id: recipeId,
+      name: recipeName,
+      image: recipeImage,
+    }
+
+    // Save meal plan
+    localStorage.setItem(this.storageKey, JSON.stringify(mealPlan))
+
+    // Update meal plan display if visible
+    this.updateMealPlanDisplay()
+  },
+
+  /**
+   * Load meal plan
+   */
+  loadMealPlan() {
+    const mealPlan = JSON.parse(localStorage.getItem("meal-plan") || "{}")
+
+    // Get all day cards
+    const dayCards = document.querySelectorAll(".day-card")
+
+    // Update each day card
+    dayCards.forEach((dayCard) => {
+      const dayName = dayCard.querySelector("h4").textContent.toLowerCase()
+      const dayData = mealPlan[dayName] || {}
+
+      // Get meal slots
+      const mealSlots = dayCard.querySelectorAll(".meal-slot")
+
+      // Update each meal slot
+      mealSlots.forEach((mealSlot) => {
+        const mealType = mealSlot.querySelector("h5").textContent.toLowerCase()
+        const mealData = dayData[mealType]
+
+        if (mealData && mealData.recipe) {
+          // Create meal item
+          const mealItem = document.createElement("div")
+          mealItem.className =
+            "meal-item p-2 bg-white dark:bg-dark-card rounded border border-light-border dark:border-dark-border"
+
+          mealItem.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h6 class="font-medium text-sm dark:text-dark-text">${mealData.recipe.name}</h6>
+                                <p class="text-xs text-light-textLight dark:text-dark-textLight mt-1">${mealData.recipe.category}</p>
+                            </div>
+                            <button class="remove-meal-btn text-red-500 hover:text-red-700 transition duration-300" data-day="${dayName}" data-meal-type="${mealType}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `
+
+          // Replace placeholder with meal item
+          const placeholder = mealSlot.querySelector(".meal-placeholder")
+          if (placeholder) {
+            mealSlot.replaceChild(mealItem, placeholder)
+
+            // Add event listener to remove button
+            const removeBtn = mealItem.querySelector(".remove-meal-btn")
+            if (removeBtn) {
+              removeBtn.addEventListener("click", (e) => {
+                e.stopPropagation()
+                this.removeMeal(dayName, mealType)
+              })
+            }
+          }
+        } else {
+          // Make sure placeholder exists
+          let placeholder = mealSlot.querySelector(".meal-placeholder")
+
+          if (!placeholder) {
+            placeholder = document.createElement("div")
+            placeholder.className =
+              "meal-placeholder text-center py-2 border border-dashed border-light-border dark:border-dark-border rounded text-light-textLight dark:text-dark-textLight"
+            placeholder.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Add Meal'
+
+            // Replace meal item with placeholder
+            const mealItem = mealSlot.querySelector(".meal-item")
+            if (mealItem) {
+              mealSlot.replaceChild(placeholder, mealItem)
+            } else {
+              mealSlot.appendChild(placeholder)
+            }
+
+            // Add event listener to placeholder
+            placeholder.addEventListener("click", () => {
+              this.openAddMealPlanModal()
+
+              // Set day and meal type
+              const daySelect = document.getElementById("meal-day-select")
+              const mealTypeSelect = document.getElementById("meal-type-select")
+
+              if (daySelect) {
+                const dayOption = Array.from(daySelect.options).find((option) => option.text.toLowerCase() === dayName)
+                if (dayOption) {
+                  daySelect.value = dayOption.value
+                }
+              }
+
+              if (mealTypeSelect) {
+                const mealOption = Array.from(mealTypeSelect.options).find(
+                  (option) => option.text.toLowerCase() === mealType,
+                )
+                if (mealOption) {
+                  mealTypeSelect.value = mealOption.value
+                }
+              }
+            })
+          }
+        }
       })
-  
-      printWindow.document.write(`
-                      </tbody>
-                  </table>
-                  
-                  <div class="footer">
-                      <p>Meal Plan from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
-                  </div>
-                  
-                  <script>
-                      window.onload = function() {
-                          window.print();
-                      }
-                  </script>
-              </body>
-              </html>
-          `)
-  
-      printWindow.document.close()
-    },
-  
-    /**
-     * Clear meal plan
-     */
-    clearMealPlan() {
-      localStorage.removeItem(this.storageKey)
+    })
+  },
+
+  /**
+   * Remove recipe from meal plan
+   * @param {string} day - Day value (YYYY-MM-DD)
+   * @param {string} mealType - Meal type (breakfast, lunch, dinner, snack)
+   */
+  removeFromPlan(day, mealType) {
+    const mealPlan = this.getMealPlan()
+
+    // Remove recipe from meal plan
+    if (mealPlan[day] && mealPlan[day][mealType]) {
+      delete mealPlan[day][mealType]
+
+      // Remove day if empty
+      if (Object.keys(mealPlan[day]).length === 0) {
+        delete mealPlan[day]
+      }
+
+      // Save meal plan
+      localStorage.setItem(this.storageKey, JSON.stringify(mealPlan))
+
+      // Update meal plan display
       this.updateMealPlanDisplay()
-      this.showNotification("Meal plan cleared!")
-    },
-  }
-  
-  export default MealPlanner
-  
-  
+    }
+  },
+
+  /**
+   * Remove meal
+   * @param {string} day - Day of the week
+   * @param {string} mealType - Type of meal
+   */
+  removeMeal(day, mealType) {
+    // Get meal plan data
+    const mealPlan = JSON.parse(localStorage.getItem("meal-plan") || "{}")
+
+    // Remove meal
+    if (mealPlan[day] && mealPlan[day][mealType]) {
+      delete mealPlan[day][mealType]
+
+      // Remove day if empty
+      if (Object.keys(mealPlan[day]).length === 0) {
+        delete mealPlan[day]
+      }
+
+      // Save meal plan
+      localStorage.setItem("meal-plan", JSON.stringify(mealPlan))
+
+      // Update UI
+      this.loadMealPlan()
+    }
+  },
+
+  /**
+   * Get meal plan from localStorage
+   * @returns {Object} - Meal plan object
+   */
+  getMealPlan() {
+    const mealPlan = localStorage.getItem(this.storageKey)
+    return mealPlan ? JSON.parse(mealPlan) : {}
+  },
+
+  /**
+   * Update meal plan display if visible
+   */
+  updateMealPlanDisplay() {
+    const mealPlanContainer = document.getElementById("meal-plan-container")
+    if (mealPlanContainer && mealPlanContainer.offsetParent !== null) {
+      this.renderMealPlan(mealPlanContainer)
+    }
+  },
+
+  /**
+   * Render meal plan in container
+   * @param {HTMLElement} container - Container element
+   */
+  renderMealPlan(container) {
+    const mealPlan = this.getMealPlan()
+    const days = this.getNextSevenDays()
+
+    // Check if meal plan is empty
+    const isEmpty = Object.keys(mealPlan).length === 0
+
+    if (isEmpty) {
+      container.innerHTML = `
+                <div class="text-center py-8">
+                    <i class="fas fa-calendar-alt text-5xl text-light-textLight dark:text-dark-textLight mb-4"></i>
+                    <p class="text-lg text-light-textLight dark:text-dark-textLight mb-2">Your meal plan is empty</p>
+                    <p class="text-light-textLight dark:text-dark-textLight mb-6">Add recipes to your meal plan to get started</p>
+                </div>
+            `
+      return
+    }
+
+    // Create meal plan table
+    let html = `
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Day</th>
+                            <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Breakfast</th>
+                            <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Lunch</th>
+                            <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Dinner</th>
+                            <th class="py-2 px-4 bg-light-bg dark:bg-dark-bg text-left font-medium">Snack</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `
+
+    // Add rows for each day
+    days.forEach((day) => {
+      const dayData = mealPlan[day.value] || {}
+
+      html += `
+                <tr class="border-b border-light-border dark:border-dark-border">
+                    <td class="py-3 px-4 font-medium dark:text-dark-text">${day.label}</td>
+                    ${this.renderMealCell(dayData.breakfast, day.value, "breakfast")}
+                    ${this.renderMealCell(dayData.lunch, day.value, "lunch")}
+                    ${this.renderMealCell(dayData.dinner, day.value, "dinner")}
+                    ${this.renderMealCell(dayData.snack, day.value, "snack")}
+                </tr>
+            `
+    })
+
+    html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button id="print-meal-plan-btn" class="flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300 mr-4">
+                    <i class="fas fa-print mr-2"></i> Print Meal Plan
+                </button>
+                <button id="clear-meal-plan-btn" class="flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                    <i class="fas fa-trash-alt mr-2"></i> Clear Meal Plan
+                </button>
+            </div>
+        `
+
+    container.innerHTML = html
+
+    // Add event listeners
+    document.getElementById("print-meal-plan-btn").addEventListener("click", () => {
+      this.printMealPlan()
+    })
+
+    document.getElementById("clear-meal-plan-btn").addEventListener("click", () => {
+      if (confirm("Are you sure you want to clear your meal plan?")) {
+        this.clearMealPlan()
+      }
+    })
+
+    // Add event listeners to remove buttons
+    document.querySelectorAll(".remove-meal-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const day = button.getAttribute("data-day")
+        const mealType = button.getAttribute("data-meal-type")
+        this.removeFromPlan(day, mealType)
+      })
+    })
+  },
+
+  /**
+   * Clear meal plan
+   */
+  clearMealPlan() {
+    // Clear meal plan data
+    localStorage.removeItem("meal-plan")
+
+    // Update UI
+    this.loadMealPlan()
+  },
+
+  /**
+   * Print meal plan
+   */
+  printMealPlan() {
+    const mealPlan = JSON.parse(localStorage.getItem("meal-plan") || "{}")
+
+    // Check if meal plan is empty
+    if (Object.keys(mealPlan).length === 0) {
+      alert("Your meal plan is empty")
+      return
+    }
+
+    // Create print window
+    const printWindow = window.open("", "_blank")
+
+    // Create print content
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    const mealTypes = ["breakfast", "lunch", "dinner"]
+
+    let printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Meal Plan - Flavor Vault</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                h1 {
+                    font-size: 24px;
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
+                h2 {
+                    font-size: 18px;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                    border-bottom: 1px solid #eee;
+                    padding-bottom: 5px;
+                }
+                h3 {
+                    font-size: 16px;
+                    margin-bottom: 5px;
+                }
+                .meal {
+                    margin-bottom: 15px;
+                    padding: 10px;
+                    background-color: #f9f9f9;
+                    border-radius: 5px;
+                }
+                .meal-empty {
+                    color: #999;
+                    font-style: italic;
+                }
+                .footer {
+                    margin-top: 30px;
+                    font-size: 12px;
+                    color: #666;
+                    text-align: center;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Weekly Meal Plan</h1>
+        `
+
+    // Add days
+    days.forEach((day) => {
+      const dayData = mealPlan[day] || {}
+      const dayName = day.charAt(0).toUpperCase() + day.slice(1)
+
+      printContent += `<h2>${dayName}</h2>`
+
+      // Add meal types
+      mealTypes.forEach((mealType) => {
+        const mealData = dayData[mealType]
+        const mealTypeName = mealType.charAt(0).toUpperCase() + mealType.slice(1)
+
+        printContent += `<h3>${mealTypeName}</h3>`
+
+        if (mealData && mealData.recipe) {
+          printContent += `
+                    <div class="meal">
+                        <div><strong>${mealData.recipe.name}</strong></div>
+                        <div>Category: ${mealData.recipe.category}</div>
+                        ${mealData.notes ? `<div>Notes: ${mealData.notes}</div>` : ""}
+                    </div>
+                    `
+        } else {
+          printContent += `<div class="meal-empty">No meal planned</div>`
+        }
+      })
+    })
+
+    printContent += `
+            <div class="footer">
+                <p>Meal Plan from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <script>
+                window.onload = function() {
+                    window.print();
+                }
+            </script>
+        </body>
+        </html>
+        `
+
+    // Write content to print window
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+  },
+
+  /**
+   * Generate shopping list
+   */
+  generateShoppingList() {
+    const mealPlan = JSON.parse(localStorage.getItem("meal-plan") || "{}")
+
+    // Check if meal plan is empty
+    if (Object.keys(mealPlan).length === 0) {
+      alert("Your meal plan is empty")
+      return
+    }
+
+    // Collect all ingredients
+    const ingredients = []
+
+    // Iterate over days
+    Object.values(mealPlan).forEach((dayData) => {
+      // Iterate over meal types
+      Object.values(dayData).forEach((mealData) => {
+        if (mealData && mealData.recipe && mealData.recipe.ingredients) {
+          // Add ingredients
+          mealData.recipe.ingredients.forEach((ingredient) => {
+            // Check if ingredient already exists
+            const existingIndex = ingredients.findIndex(
+              (item) => item.name.toLowerCase() === ingredient.name.toLowerCase(),
+            )
+
+            if (existingIndex === -1) {
+              // Add new ingredient
+              ingredients.push({
+                id: `meal-plan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                name: ingredient.name,
+                amount: ingredient.amount || "",
+                category: mealData.recipe.category || "Other",
+              })
+            } else {
+              // Combine amounts if possible
+              const existing = ingredients[existingIndex]
+
+              if (existing.amount && ingredient.amount) {
+                existing.amount += `, ${ingredient.amount}`
+              } else if (ingredient.amount) {
+                existing.amount = ingredient.amount
+              }
+            }
+          })
+        }
+      })
+    })
+
+    // Sort by category
+    ingredients.sort((a, b) => a.category.localeCompare(b.category))
+
+    // Save to shopping list
+    localStorage.setItem("shopping-list", JSON.stringify(ingredients))
+
+    // Update UI
+    this.updateShoppingListUI(ingredients)
+
+    // Show success message
+    alert("Shopping list generated successfully!")
+  },
+
+  /**
+   * Update shopping list UI
+   * @param {Array} ingredients - Array of ingredient objects
+   */
+  updateShoppingListUI(ingredients) {
+    const shoppingListContainer = document.getElementById("meal-plan-shopping-list")
+    if (!shoppingListContainer) return
+
+    if (ingredients.length === 0) {
+      // Show empty message
+      shoppingListContainer.innerHTML = `
+                <div class="text-center py-8 text-light-textLight dark:text-dark-textLight">
+                    <i class="fas fa-shopping-basket text-5xl mb-4"></i>
+                    <p class="text-lg">Your meal plan shopping list is empty</p>
+                    <p class="mb-4">Add recipes to your meal plan to generate a shopping list</p>
+                </div>
+            `
+      return
+    }
+
+    // Group by category
+    const groupedIngredients = {}
+
+    ingredients.forEach((ingredient) => {
+      if (!groupedIngredients[ingredient.category]) {
+        groupedIngredients[ingredient.category] = []
+      }
+
+      groupedIngredients[ingredient.category].push(ingredient)
+    })
+
+    // Render grouped ingredients
+    let html = ""
+
+    Object.keys(groupedIngredients).forEach((category) => {
+      html += `
+                <div class="mb-4">
+                    <h4 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">${category}</h4>
+                    <ul class="space-y-2">
+            `
+
+      groupedIngredients[category].forEach((ingredient) => {
+        html += `
+                    <li class="flex items-center">
+                        <input type="checkbox" class="shopping-item-checkbox mr-2" data-id="${ingredient.id}">
+                        <span class="flex-1 dark:text-dark-text">${ingredient.amount ? ingredient.amount + " " : ""}${ingredient.name}</span>
+                    </li>
+                `
+      })
+
+      html += `
+                    </ul>
+                </div>
+            `
+    })
+
+    // Set shopping list HTML
+    shoppingListContainer.innerHTML = html
+
+    // Add event listeners to checkboxes
+    const checkboxes = shoppingListContainer.querySelectorAll(".shopping-item-checkbox")
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        const itemId = checkbox.getAttribute("data-id")
+        this.toggleShoppingItem(itemId, checkbox.checked)
+      })
+    })
+  },
+
+  /**
+   * Toggle shopping item checked state
+   * @param {string} itemId - Item ID
+   * @param {boolean} isChecked - Whether the item is checked
+   */
+  toggleShoppingItem(itemId, isChecked) {
+    // Get shopping list
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Update checked state
+    const updatedList = shoppingList.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, checked: isChecked }
+      }
+      return item
+    })
+
+    // Save shopping list
+    localStorage.setItem("shopping-list", JSON.stringify(updatedList))
+  },
+
+  /**
+   * Add recipe to meal plan
+   * @param {string} recipeId - Recipe ID
+   * @param {string} recipeName - Recipe name
+   * @param {string} recipeImage - Recipe image URL
+   */
+  addRecipeToMealPlan(recipeId, recipeName, recipeImage) {
+    // Get the recipe data
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]")
+    const recentRecipes = JSON.parse(localStorage.getItem("recent-recipes") || "[]")
+
+    // Find the recipe
+    let recipe = favorites.find((r) => r.id === recipeId)
+
+    if (!recipe) {
+      recipe = recentRecipes.find((r) => r.id === recipeId)
+    }
+
+    if (!recipe) {
+      // Create a minimal recipe object
+      recipe = {
+        id: recipeId,
+        name: recipeName,
+        thumbnail: recipeImage,
+        category: "Other",
+        ingredients: [],
+      }
+    }
+
+    // Open add meal plan modal
+    this.openAddMealPlanModal()
+
+    // Set recipe
+    const recipeSelect = document.getElementById("meal-recipe-select")
+    if (recipeSelect) {
+      // Check if option already exists
+      let option = Array.from(recipeSelect.options).find((opt) => opt.value && JSON.parse(opt.value).id === recipeId)
+
+      if (!option) {
+        // Add option
+        option = document.createElement("option")
+        option.value = JSON.stringify(recipe)
+        option.textContent = recipeName
+        recipeSelect.appendChild(option)
+      }
+
+      // Select option
+      option.selected = true
+    }
+  },
+}
+
+export default MealPlanner
+
