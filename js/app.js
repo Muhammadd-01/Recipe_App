@@ -5,6 +5,8 @@ import DarkMode from "./darkMode.js"
 import Search from "./search.js"
 import MealPlanner from "./mealPlanner.js"
 import RestaurantFinder from "./restaurantFinder.js"
+import ModalManager from "./modalManager.js"
+import NavigationManager from "./navigationManager.js"
 
 /**
  * Main App Controller
@@ -19,12 +21,22 @@ const App = {
    * Initialize the app
    */
   async init() {
+    console.log("Initializing App")
+
     // Make API available globally for restaurant finder
     window.API = API
 
     // Initialize UI and Dark Mode
     UI.init()
+
+    // Initialize Dark Mode
     DarkMode.init()
+
+    // Initialize Modal Manager
+    ModalManager.init()
+
+    // Initialize Navigation Manager
+    NavigationManager.init()
 
     // Initialize Search
     Search.init(API)
@@ -51,12 +63,16 @@ const App = {
 
     // Make App available globally for Search
     window.App = this
+
+    console.log("App initialization complete")
   },
 
   /**
    * Set up event listeners
    */
   setupEventListeners() {
+    console.log("Setting up event listeners")
+
     // Mobile menu toggle
     const mobileMenuButton = document.getElementById("mobile-menu-button")
     const mobileMenu = document.getElementById("mobile-menu")
@@ -99,16 +115,8 @@ const App = {
     if (exploreRecipesBtn) {
       exploreRecipesBtn.addEventListener("click", (e) => {
         e.preventDefault()
-        UI.showView("home")
-
-        // Update active nav link
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          if (link.getAttribute("data-view") === "home") {
-            link.classList.add("active")
-          } else {
-            link.classList.remove("active")
-          }
-        })
+        NavigationManager.showView("home")
+        NavigationManager.updateActiveNavLink("home")
       })
     }
 
@@ -140,26 +148,19 @@ const App = {
         e.preventDefault()
         const category = link.getAttribute("data-category")
         this.handleCategorySelect(category)
-
-        // Show home view
-        UI.showView("home")
-
-        // Update active nav link
-        document.querySelectorAll(".nav-link").forEach((navLink) => {
-          if (navLink.getAttribute("data-view") === "home") {
-            navLink.classList.add("active")
-          } else {
-            navLink.classList.remove("active")
-          }
-        })
-
-        // Scroll to top
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
+        NavigationManager.showView("home")
+        NavigationManager.updateActiveNavLink("home")
       })
     })
+
+    // Show meal planner button
+    const showMealPlannerBtn = document.getElementById("show-meal-planner-btn")
+    if (showMealPlannerBtn) {
+      showMealPlannerBtn.addEventListener("click", () => {
+        NavigationManager.showView("meal-planner")
+        NavigationManager.updateActiveNavLink("meal-planner")
+      })
+    }
   },
 
   /**
@@ -440,24 +441,8 @@ const App = {
         a.addEventListener("click", (e) => {
           e.preventDefault()
           this.handleCategorySelect(category.name)
-
-          // Show home view
-          UI.showView("home")
-
-          // Update active nav link
-          document.querySelectorAll(".nav-link").forEach((link) => {
-            if (link.getAttribute("data-view") === "home") {
-              link.classList.add("active")
-            } else {
-              link.classList.remove("active")
-            }
-          })
-
-          // Scroll to top
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          })
+          NavigationManager.showView("home")
+          NavigationManager.updateActiveNavLink("home")
         })
 
         li.appendChild(a)
@@ -529,16 +514,8 @@ const App = {
       UI.renderRecipes(limitedRecipes)
 
       // Show home view
-      UI.showView("home")
-
-      // Update active nav link
-      document.querySelectorAll(".nav-link").forEach((link) => {
-        if (link.getAttribute("data-view") === "home") {
-          link.classList.add("active")
-        } else {
-          link.classList.remove("active")
-        }
-      })
+      NavigationManager.showView("home")
+      NavigationManager.updateActiveNavLink("home")
 
       // Reset category buttons
       document.querySelectorAll(".filter-btn").forEach((btn) => {
@@ -568,63 +545,10 @@ const App = {
 
 // Add user account functionality
 function initUserAccount() {
-  const userAccountBtn = document.getElementById("user-account-btn")
-  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
-  const loginModal = document.getElementById("login-modal")
-  const signupModal = document.getElementById("signup-modal")
-  const closeLoginModalBtn = document.getElementById("close-login-modal-btn")
-  const closeSignupModalBtn = document.getElementById("close-signup-modal-btn")
-  const showSignupBtn = document.getElementById("show-signup-btn")
-  const showLoginBtn = document.getElementById("show-login-btn")
+  console.log("Initializing user account functionality")
+
   const loginForm = document.getElementById("login-form")
   const signupForm = document.getElementById("signup-form")
-
-  // Show login modal
-  if (userAccountBtn) {
-    userAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  if (mobileUserAccountBtn) {
-    mobileUserAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  // Close login modal
-  if (closeLoginModalBtn) {
-    closeLoginModalBtn.addEventListener("click", () => {
-      loginModal.classList.add("hidden")
-    })
-  }
-
-  // Close signup modal
-  if (closeSignupModalBtn) {
-    closeSignupModalBtn.addEventListener("click", () => {
-      signupModal.classList.add("hidden")
-    })
-  }
-
-  // Switch to signup modal
-  if (showSignupBtn) {
-    showSignupBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.add("hidden")
-      signupModal.classList.remove("hidden")
-    })
-  }
-
-  // Switch to login modal
-  if (showLoginBtn) {
-    showLoginBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      signupModal.classList.add("hidden")
-      loginModal.classList.remove("hidden")
-    })
-  }
 
   // Handle login form submission
   if (loginForm) {
@@ -685,7 +609,7 @@ function initUserAccount() {
       updateUserUI(userData)
 
       // Close modal
-      loginModal.classList.add("hidden")
+      ModalManager.closeModal("login-modal")
 
       // Reset form
       loginForm.reset()
@@ -719,7 +643,7 @@ function initUserAccount() {
       updateUserUI(userData)
 
       // Close modal
-      signupModal.classList.add("hidden")
+      ModalManager.closeModal("signup-modal")
 
       // Reset form
       signupForm.reset()
@@ -732,6 +656,9 @@ function initUserAccount() {
 
   // Update UI based on user login state
   function updateUserUI(userData) {
+    const userAccountBtn = document.getElementById("user-account-btn")
+    const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
+
     if (userData && userData.isLoggedIn) {
       // Update account button text
       if (userAccountBtn) {
@@ -760,18 +687,11 @@ function initUserAccount() {
 
 // Add shopping list functionality
 function initShoppingList() {
-  const shoppingListModal = document.getElementById("shopping-list-modal")
-  const closeShoppingListModalBtn = document.getElementById("close-shopping-list-modal-btn")
+  console.log("Initializing shopping list functionality")
+
   const clearShoppingListBtn = document.getElementById("clear-shopping-list-btn")
   const printShoppingListBtn = document.getElementById("print-shopping-list-btn")
   const shoppingListContainer = document.getElementById("shopping-list-container")
-
-  // Close shopping list modal
-  if (closeShoppingListModalBtn) {
-    closeShoppingListModalBtn.addEventListener("click", () => {
-      shoppingListModal.classList.add("hidden")
-    })
-  }
 
   // Clear shopping list
   if (clearShoppingListBtn) {
@@ -796,12 +716,12 @@ function initShoppingList() {
 
     if (shoppingList.length === 0) {
       shoppingListContainer.innerHTML = `
-                <div class="text-center py-8 text-light-textLight dark:text-dark-textLight">
-                    <i class="fas fa-shopping-basket text-5xl mb-4"></i>
-                    <p class="text-lg">Your shopping list is empty</p>
-                    <p class="mb-4">Add ingredients from recipes to create your shopping list</p>
-                </div>
-            `
+        <div class="text-center py-8 text-light-textLight dark:text-dark-textLight">
+          <i class="fas fa-shopping-basket text-5xl mb-4"></i>
+          <p class="text-lg">Your shopping list is empty</p>
+          <p class="mb-4">Add ingredients from recipes to create your shopping list</p>
+        </div>
+      `
       return
     }
 
@@ -821,27 +741,27 @@ function initShoppingList() {
 
     Object.keys(groupedItems).forEach((category) => {
       html += `
-                <div class="mb-4">
-                    <h4 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">${category}</h4>
-                    <ul class="space-y-2">
-            `
+        <div class="mb-4">
+          <h4 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">${category}</h4>
+          <ul class="space-y-2">
+      `
 
       groupedItems[category].forEach((item) => {
         html += `
-                    <li class="flex items-center">
-                        <input type="checkbox" class="shopping-item-checkbox mr-2" data-id="${item.id}">
-                        <span class="flex-1 dark:text-dark-text">${item.amount ? item.amount + " " : ""}${item.name}</span>
-                        <button class="remove-shopping-item-btn text-red-500 hover:text-red-700 transition duration-300" data-id="${item.id}">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </li>
-                `
+          <li class="flex items-center">
+            <input type="checkbox" class="shopping-item-checkbox mr-2" data-id="${item.id}">
+            <span class="flex-1 dark:text-dark-text">${item.amount ? item.amount + " " : ""}${item.name}</span>
+            <button class="remove-shopping-item-btn text-red-500 hover:text-red-700 transition duration-300" data-id="${item.id}">
+              <i class="fas fa-times"></i>
+            </button>
+          </li>
+        `
       })
 
       html += `
-                    </ul>
-                </div>
-            `
+          </ul>
+        </div>
+      `
     })
 
     shoppingListContainer.innerHTML = html
@@ -914,84 +834,84 @@ function initShoppingList() {
     const printWindow = window.open("", "_blank")
 
     printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Shopping List - Flavor Vault</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 20px;
-                    }
-                    h1 {
-                        font-size: 24px;
-                        margin-bottom: 20px;
-                        text-align: center;
-                    }
-                    h2 {
-                        font-size: 18px;
-                        margin-top: 20px;
-                        margin-bottom: 10px;
-                        border-bottom: 1px solid #eee;
-                        padding-bottom: 5px;
-                    }
-                    ul {
-                        list-style-type: square;
-                        padding-left: 20px;
-                    }
-                    li {
-                        margin-bottom: 5px;
-                    }
-                    .checked {
-                        text-decoration: line-through;
-                        color: #999;
-                    }
-                    .footer {
-                        margin-top: 30px;
-                        font-size: 12px;
-                        color: #666;
-                        text-align: center;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Shopping List</h1>
-        `)
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Shopping List - Flavor Vault</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+          }
+          h2 {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+          }
+          ul {
+            list-style-type: square;
+            padding-left: 20px;
+          }
+          li {
+            margin-bottom: 5px;
+          }
+          .checked {
+            text-decoration: line-through;
+            color: #999;
+          }
+          .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Shopping List</h1>
+    `)
 
     // Add categories and items
     Object.keys(groupedItems).forEach((category) => {
       printWindow.document.write(`
-                <h2>${category}</h2>
-                <ul>
-            `)
+        <h2>${category}</h2>
+        <ul>
+      `)
 
       groupedItems[category].forEach((item) => {
         printWindow.document.write(`
-                    <li class="${item.checked ? "checked" : ""}">${item.amount ? item.amount + " " : ""}${item.name}</li>
-                `)
+          <li class="${item.checked ? "checked" : ""}">${item.amount ? item.amount + " " : ""}${item.name}</li>
+        `)
       })
 
       printWindow.document.write(`
-                </ul>
-            `)
+        </ul>
+      `)
     })
 
     printWindow.document.write(`
-                <div class="footer">
-                    <p>Shopping List from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <script>
-                    window.onload = function() {
-                        window.print();
-                    }
-                </script>
-            </body>
-            </html>
-        `)
+        <div class="footer">
+          <p>Shopping List from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+          }
+        </script>
+      </body>
+      </html>
+    `)
 
     printWindow.document.close()
   }
@@ -1002,18 +922,11 @@ function initShoppingList() {
 
 // Add recipe submission functionality
 function initRecipeSubmission() {
-  const submitRecipeModal = document.getElementById("submit-recipe-modal")
-  const closeSubmitRecipeModalBtn = document.getElementById("close-submit-recipe-modal-btn")
+  console.log("Initializing recipe submission functionality")
+
   const submitRecipeForm = document.getElementById("submit-recipe-form")
   const addIngredientBtn = document.getElementById("add-ingredient-btn")
   const ingredientsContainer = document.getElementById("ingredients-container")
-
-  // Close submit recipe modal
-  if (closeSubmitRecipeModalBtn) {
-    closeSubmitRecipeModalBtn.addEventListener("click", () => {
-      submitRecipeModal.classList.add("hidden")
-    })
-  }
 
   // Add ingredient
   if (addIngredientBtn) {
@@ -1029,12 +942,12 @@ function initRecipeSubmission() {
     const ingredientField = document.createElement("div")
     ingredientField.className = "flex items-center space-x-2"
     ingredientField.innerHTML = `
-            <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-            <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-            <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
-                <i class="fas fa-times"></i>
-            </button>
-        `
+      <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+      <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+      <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
+        <i class="fas fa-times"></i>
+      </button>
+    `
 
     ingredientsContainer.appendChild(ingredientField)
 
@@ -1121,21 +1034,21 @@ function initRecipeSubmission() {
       alert("Recipe submitted successfully!")
 
       // Close modal
-      submitRecipeModal.classList.add("hidden")
+      ModalManager.closeModal("submit-recipe-modal")
 
       // Reset form
       submitRecipeForm.reset()
 
       // Clear ingredients
       ingredientsContainer.innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-                    <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-                    <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `
+        <div class="flex items-center space-x-2">
+          <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+          <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+          <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `
 
       // Reset button
       submitButton.disabled = false
@@ -1144,23 +1057,17 @@ function initRecipeSubmission() {
   }
 }
 
-// Add recipe rating functionality
+// Initialize recipe rating functionality
 function initRecipeRating() {
+  console.log("Initializing recipe rating functionality")
+
   const rateRecipeModal = document.getElementById("rate-recipe-modal")
-  const closeRateRecipeModalBtn = document.getElementById("close-rate-recipe-modal-btn")
   const stars = document.querySelectorAll(".star")
   const ratingText = document.getElementById("rating-text")
   const submitRatingBtn = document.getElementById("submit-rating-btn")
 
   let currentRating = 0
   let currentRecipeId = null
-
-  // Close rate recipe modal
-  if (closeRateRecipeModalBtn) {
-    closeRateRecipeModalBtn.addEventListener("click", () => {
-      rateRecipeModal.classList.add("hidden")
-    })
-  }
 
   // Handle star rating
   if (stars.length > 0) {
@@ -1254,7 +1161,7 @@ function initRecipeRating() {
       alert("Rating submitted successfully!")
 
       // Close modal
-      rateRecipeModal.classList.add("hidden")
+      ModalManager.closeModal("rate-recipe-modal")
 
       // Reset form
       currentRating = 0
@@ -1298,22 +1205,15 @@ function initRecipeRating() {
     }
 
     // Show modal
-    rateRecipeModal.classList.remove("hidden")
+    ModalManager.openModal("rate-recipe-modal")
   }
 }
 
-// Add enhanced social sharing functionality
+// Initialize social sharing functionality
 function initSocialSharing() {
-  const shareRecipeModal = document.getElementById("share-recipe-modal")
-  const closeShareRecipeModalBtn = document.getElementById("close-share-recipe-modal-btn")
-  const copyLinkBtn = document.getElementById("copy-link-btn")
+  console.log("Initializing social sharing functionality")
 
-  // Close share recipe modal
-  if (closeShareRecipeModalBtn) {
-    closeShareRecipeModalBtn.addEventListener("click", () => {
-      shareRecipeModal.classList.add("hidden")
-    })
-  }
+  const copyLinkBtn = document.getElementById("copy-link-btn")
 
   // Copy link to clipboard
   if (copyLinkBtn) {
@@ -1336,6 +1236,7 @@ function initSocialSharing() {
 
   // Open sharing modal for a recipe
   window.openSharingModal = (recipeId, recipeName, recipeImage) => {
+    const shareRecipeModal = document.getElementById("share-recipe-modal")
     if (!shareRecipeModal) return
 
     // Set recipe name
@@ -1364,7 +1265,7 @@ function initSocialSharing() {
     }
 
     if (twitterShare) {
-      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeName}`
       const text = `Check out this delicious ${recipeName} recipe I found on Flavor Vault!`
       twitterShare.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
       twitterShare.target = "_blank"
@@ -1385,160 +1286,11 @@ function initSocialSharing() {
     }
 
     // Show modal
-    shareRecipeModal.classList.remove("hidden")
+    ModalManager.openModal("share-recipe-modal")
   }
 }
 
-// Add this at the end of the file, just before the DOMContentLoaded event listener
-
-// Show modals when buttons are clicked
-function setupModalTriggers() {
-  console.log("Setting up modal triggers")
-
-  // Direct modal buttons
-  const showAccountModalBtn = document.getElementById("show-account-modal-btn")
-  const showShoppingListModalBtn = document.getElementById("show-shopping-list-modal-btn")
-  const showSubmitRecipeModalBtn = document.getElementById("show-submit-recipe-modal-btn")
-  const showRateRecipeModalBtn = document.getElementById("show-rate-recipe-modal-btn")
-  const showShareRecipeModalBtn = document.getElementById("show-share-recipe-modal-btn")
-  const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
-
-  // Get modals
-  const loginModal = document.getElementById("login-modal")
-  const shoppingListModal = document.getElementById("shopping-list-modal")
-  const submitRecipeModal = document.getElementById("submit-recipe-modal")
-  const rateRecipeModal = document.getElementById("rate-recipe-modal")
-  const shareRecipeModal = document.getElementById("share-recipe-modal")
-
-  console.log("Modals found:", {
-    loginModal: !!loginModal,
-    shoppingListModal: !!shoppingListModal,
-    submitRecipeModal: !!submitRecipeModal,
-    rateRecipeModal: !!rateRecipeModal,
-    shareRecipeModal: !!shareRecipeModal,
-  })
-
-  // Account modal button
-  if (showAccountModalBtn && loginModal) {
-    showAccountModalBtn.addEventListener("click", () => {
-      console.log("Opening account modal")
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  // Shopping list modal button
-  if (showShoppingListModalBtn && shoppingListModal) {
-    showShoppingListModalBtn.addEventListener("click", () => {
-      console.log("Opening shopping list modal")
-      shoppingListModal.classList.remove("hidden")
-    })
-  }
-
-  // Submit recipe modal button
-  if (showSubmitRecipeModalBtn && submitRecipeModal) {
-    showSubmitRecipeModalBtn.addEventListener("click", () => {
-      console.log("Opening submit recipe modal")
-      submitRecipeModal.classList.remove("hidden")
-    })
-  }
-
-  // Rate recipe modal button
-  if (showRateRecipeModalBtn && rateRecipeModal) {
-    showRateRecipeModalBtn.addEventListener("click", () => {
-      console.log("Opening rate recipe modal")
-      // Set a default recipe name for demo purposes
-      const recipeNameElement = document.getElementById("rate-recipe-name")
-      if (recipeNameElement) {
-        recipeNameElement.textContent = "Sample Recipe"
-      }
-      rateRecipeModal.classList.remove("hidden")
-    })
-  }
-
-  // Share recipe modal button
-  if (showShareRecipeModalBtn && shareRecipeModal) {
-    showShareRecipeModalBtn.addEventListener("click", () => {
-      console.log("Opening share recipe modal")
-      // Set a default recipe name for demo purposes
-      const recipeNameElement = document.getElementById("share-recipe-name")
-      if (recipeNameElement) {
-        recipeNameElement.textContent = "Sample Recipe"
-      }
-      // Set a default share link
-      const shareLinkInput = document.getElementById("share-link")
-      if (shareLinkInput) {
-        shareLinkInput.value = window.location.href
-      }
-      shareRecipeModal.classList.remove("hidden")
-    })
-  }
-
-  // Toggle dark mode button
-  if (toggleDarkModeBtn) {
-    toggleDarkModeBtn.addEventListener("click", () => {
-      console.log("Toggling dark mode")
-      DarkMode.toggleTheme()
-    })
-  }
-
-  // User account button in nav
-  const userAccountBtn = document.getElementById("user-account-btn")
-  if (userAccountBtn && loginModal) {
-    userAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      console.log("Opening account modal from nav")
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  // Mobile user account button
-  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
-  if (mobileUserAccountBtn && loginModal) {
-    mobileUserAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      console.log("Opening account modal from mobile nav")
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  // Close buttons for all modals
-  const closeButtons = document.querySelectorAll('[id$="-modal-btn"]')
-  closeButtons.forEach((button) => {
-    if (button.id.startsWith("close-")) {
-      const modalId = button.id.replace("close-", "")
-      const modal = document.getElementById(modalId)
-      if (modal) {
-        button.addEventListener("click", () => {
-          console.log(`Closing ${modalId}`)
-          modal.classList.add("hidden")
-        })
-      }
-    }
-  })
-
-  // Switch between login and signup
-  const showSignupBtn = document.getElementById("show-signup-btn")
-  const showLoginBtn = document.getElementById("show-login-btn")
-  const signupModal = document.getElementById("signup-modal")
-
-  if (showSignupBtn && loginModal && signupModal) {
-    showSignupBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.add("hidden")
-      signupModal.classList.remove("hidden")
-    })
-  }
-
-  if (showLoginBtn && loginModal && signupModal) {
-    showLoginBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      signupModal.classList.add("hidden")
-      loginModal.classList.remove("hidden")
-    })
-  }
-}
-
-// Replace the existing DOMContentLoaded event listener with this one
+// Initialize the app when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM fully loaded")
 
@@ -1552,157 +1304,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initRecipeRating()
   initSocialSharing()
 
-  // Make sure UI is initialized properly
-  if (window.UI && typeof window.UI.init === "function") {
-    window.UI.init()
-  } else {
-    console.error("UI module not found or init method not available")
-  }
-
-  // Make sure DarkMode is initialized properly
-  if (window.DarkMode && typeof window.DarkMode.init === "function") {
-    window.DarkMode.init()
-  } else {
-    console.error("DarkMode module not found or init method not available")
-  }
-
-  // Fix dark mode toggle
-  const themeToggle = document.getElementById("theme-toggle")
-  const mobileThemeToggle = document.getElementById("mobile-theme-toggle")
-
-  if (themeToggle && window.DarkMode) {
-    themeToggle.checked = window.DarkMode.isDarkMode()
-    window.DarkMode.updateToggleAppearance(themeToggle)
-
-    // Add event listener to ensure it works
-    themeToggle.addEventListener("change", () => {
-      console.log("Theme toggle changed")
-      window.DarkMode.toggleTheme()
-    })
-  }
-
-  if (mobileThemeToggle && window.DarkMode) {
-    mobileThemeToggle.checked = window.DarkMode.isDarkMode()
-    window.DarkMode.updateToggleAppearance(mobileThemeToggle)
-
-    // Add event listener to ensure it works
-    mobileThemeToggle.addEventListener("change", () => {
-      console.log("Mobile theme toggle changed")
-      window.DarkMode.toggleTheme()
-    })
-  }
-
-  // Ensure toggle dark mode button works
-  const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
-  if (toggleDarkModeBtn && window.DarkMode) {
-    toggleDarkModeBtn.addEventListener("click", () => {
-      console.log("Toggle dark mode button clicked")
-      window.DarkMode.toggleTheme()
-
-      // Update toggle states
-      if (themeToggle) {
-        themeToggle.checked = window.DarkMode.isDarkMode()
-        window.DarkMode.updateToggleAppearance(themeToggle)
-      }
-
-      if (mobileThemeToggle) {
-        mobileThemeToggle.checked = window.DarkMode.isDarkMode()
-        window.DarkMode.updateToggleAppearance(mobileThemeToggle)
-      }
-    })
-  }
-
-  // Manually setup modal triggers as a fallback
-  setupModalTriggers()
-
   console.log("App fully initialized")
 })
 
-// Add this function to ensure modal triggers are set up
-function setupModalTriggers() {
-  console.log("Setting up modal triggers (fallback)")
-
-  // Direct modal buttons
-  const modalTriggers = [
-    { triggerId: "show-account-modal-btn", modalId: "login-modal" },
-    { triggerId: "user-account-btn", modalId: "login-modal" },
-    { triggerId: "mobile-user-account-btn", modalId: "login-modal" },
-    { triggerId: "show-shopping-list-modal-btn", modalId: "shopping-list-modal" },
-    { triggerId: "show-submit-recipe-modal-btn", modalId: "submit-recipe-modal" },
-    { triggerId: "show-rate-recipe-modal-btn", modalId: "rate-recipe-modal" },
-    { triggerId: "show-share-recipe-modal-btn", modalId: "share-recipe-modal" },
-  ]
-
-  modalTriggers.forEach(({ triggerId, modalId }) => {
-    const trigger = document.getElementById(triggerId)
-    const modal = document.getElementById(modalId)
-
-    if (trigger && modal) {
-      console.log(`Setting up modal trigger: ${triggerId} -> ${modalId}`)
-
-      trigger.addEventListener("click", (e) => {
-        e.preventDefault()
-        console.log(`Opening modal: ${modalId}`)
-        modal.classList.remove("hidden")
-
-        // Special handling for specific modals
-        if (modalId === "rate-recipe-modal") {
-          const recipeNameElement = document.getElementById("rate-recipe-name")
-          if (recipeNameElement) {
-            recipeNameElement.textContent = "Sample Recipe"
-          }
-        }
-
-        if (modalId === "share-recipe-modal") {
-          const recipeNameElement = document.getElementById("share-recipe-name")
-          if (recipeNameElement) {
-            recipeNameElement.textContent = "Sample Recipe"
-          }
-
-          const shareLinkInput = document.getElementById("share-link")
-          if (shareLinkInput) {
-            shareLinkInput.value = window.location.href
-          }
-        }
-      })
-    } else {
-      if (!trigger) console.warn(`Trigger element not found: ${triggerId}`)
-      if (!modal) console.warn(`Modal element not found: ${modalId}`)
-    }
-  })
-
-  // Close buttons for all modals
-  const closeButtons = document.querySelectorAll('[id^="close-"][id$="-modal-btn"]')
-  closeButtons.forEach((button) => {
-    const modalId = button.id.replace("close-", "").replace("-btn", "")
-    const modal = document.getElementById(modalId)
-
-    if (button && modal) {
-      button.addEventListener("click", () => {
-        console.log(`Closing ${modalId}`)
-        modal.classList.add("hidden")
-      })
-    }
-  })
-
-  // Switch between login and signup
-  const modalSwitches = [
-    { triggerId: "show-signup-btn", fromModalId: "login-modal", toModalId: "signup-modal" },
-    { triggerId: "show-login-btn", fromModalId: "signup-modal", toModalId: "login-modal" },
-  ]
-
-  modalSwitches.forEach(({ triggerId, fromModalId, toModalId }) => {
-    const trigger = document.getElementById(triggerId)
-    const fromModal = document.getElementById(fromModalId)
-    const toModal = document.getElementById(toModalId)
-
-    if (trigger && fromModal && toModal) {
-      trigger.addEventListener("click", (e) => {
-        e.preventDefault()
-        fromModal.classList.add("hidden")
-        toModal.classList.remove("hidden")
-      })
-    }
-  })
-}
+// Export App for use in other modules
+export default App
 

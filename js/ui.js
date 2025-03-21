@@ -6,6 +6,16 @@ const UI = {
    * Initialize UI
    */
   init() {
+    console.log("Initializing UI")
+
+    // Set up back to top button
+    this.setupBackToTopButton()
+
+    // Initialize tooltips
+    this.initTooltips()
+
+    // Make UI available globally
+    window.UI = this
     // Set up view navigation
     this.setupViewNavigation()
 
@@ -14,9 +24,6 @@ const UI = {
 
     // Set up modal triggers
     this.setupModalTriggers()
-
-    // Initialize tooltips
-    this.initTooltips()
 
     console.log("UI initialized")
   },
@@ -192,6 +199,34 @@ const UI = {
         e.preventDefault()
         fromModal.classList.add("hidden")
         toModal.classList.remove("hidden")
+      })
+    }
+  },
+
+  /**
+   * Set up back to top button
+   */
+  setupBackToTopButton() {
+    const backToTopButton = document.getElementById("back-to-top")
+
+    if (backToTopButton) {
+      // Show/hide back to top button based on scroll position
+      window.addEventListener("scroll", () => {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.remove("opacity-0", "invisible")
+          backToTopButton.classList.add("opacity-100", "visible")
+        } else {
+          backToTopButton.classList.remove("opacity-100", "visible")
+          backToTopButton.classList.add("opacity-0", "invisible")
+        }
+      })
+
+      // Scroll to top when button is clicked
+      backToTopButton.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
       })
     }
   },
@@ -444,7 +479,18 @@ const UI = {
 
     if (recipeDetailsContainer) {
       // Show recipe details view
-      this.showView("recipe-details")
+      if (window.NavigationManager) {
+        window.NavigationManager.showView("recipe-details")
+      } else {
+        // Fallback if NavigationManager is not available
+        const views = document.querySelectorAll(".app-view")
+        views.forEach((view) => view.classList.remove("active"))
+
+        const recipeDetailsView = document.getElementById("recipe-details-view")
+        if (recipeDetailsView) {
+          recipeDetailsView.classList.add("active")
+        }
+      }
 
       // Create recipe details HTML
       const recipeDetailsHTML = `
