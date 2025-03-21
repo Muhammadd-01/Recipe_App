@@ -83,18 +83,19 @@ const DarkMode = {
     if (savedTheme) {
       // Use saved theme preference
       if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark")
-        document.body.classList.add("dark")
+        this.applyDarkMode()
+      } else {
+        this.removeDarkMode()
       }
     } else {
       // Check for system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
 
       if (prefersDark) {
-        document.documentElement.classList.add("dark")
-        document.body.classList.add("dark")
+        this.applyDarkMode()
         localStorage.setItem(this.storageKey, "dark")
       } else {
+        this.removeDarkMode()
         localStorage.setItem(this.storageKey, "light")
       }
     }
@@ -103,19 +104,46 @@ const DarkMode = {
     // This prevents flash of incorrect theme on page load
     setTimeout(() => {
       document.body.classList.add("transition-colors", "duration-300")
+      document.documentElement.classList.add("transition-colors", "duration-300")
     }, 100)
 
     // Listen for system theme changes
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
       if (!localStorage.getItem(this.storageKey)) {
         if (e.matches) {
-          document.documentElement.classList.add("dark")
-          document.body.classList.add("dark")
+          this.applyDarkMode()
         } else {
-          document.documentElement.classList.remove("dark")
-          document.body.classList.remove("dark")
+          this.removeDarkMode()
         }
       }
+    })
+  },
+
+  /**
+   * Apply dark mode to all necessary elements
+   */
+  applyDarkMode() {
+    document.documentElement.classList.add("dark")
+    document.body.classList.add("dark")
+
+    // Update any other elements that need dark mode classes
+    const elementsToUpdate = document.querySelectorAll("[data-theme-toggle]")
+    elementsToUpdate.forEach((el) => {
+      el.classList.add("dark")
+    })
+  },
+
+  /**
+   * Remove dark mode from all necessary elements
+   */
+  removeDarkMode() {
+    document.documentElement.classList.remove("dark")
+    document.body.classList.remove("dark")
+
+    // Update any other elements that need dark mode classes
+    const elementsToUpdate = document.querySelectorAll("[data-theme-toggle]")
+    elementsToUpdate.forEach((el) => {
+      el.classList.remove("dark")
     })
   },
 
@@ -124,12 +152,10 @@ const DarkMode = {
    */
   toggleTheme() {
     if (this.isDarkMode()) {
-      document.documentElement.classList.remove("dark")
-      document.body.classList.remove("dark")
+      this.removeDarkMode()
       localStorage.setItem(this.storageKey, "light")
     } else {
-      document.documentElement.classList.add("dark")
-      document.body.classList.add("dark")
+      this.applyDarkMode()
       localStorage.setItem(this.storageKey, "dark")
     }
 

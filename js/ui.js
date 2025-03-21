@@ -319,6 +319,9 @@ const UI = {
                     <span>${recipe.ingredients.length} Ingredients</span>
                 </div>
             </div>
+              Ingredients</span>
+                </div>
+            </div>
             
             <div class="flex flex-wrap gap-4 mb-8">
                 <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
@@ -333,6 +336,12 @@ const UI = {
                 <button class="add-to-plan-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
                     <i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan
                 </button>
+                <button class="add-to-shopping-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}">
+                    <i class="fas fa-shopping-basket mr-2"></i> Add to Shopping List
+                </button>
+                <button class="rate-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}">
+                    <i class="fas fa-star mr-2"></i> Rate Recipe
+                </button>
             </div>
             
             <div class="mb-8">
@@ -344,6 +353,12 @@ const UI = {
                         <div class="flex items-center p-3 bg-light-bg dark:bg-dark-bg rounded-md hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
                             <i class="fas fa-check-circle text-secondary mr-3"></i>
                             <span class="dark:text-dark-text">${ingredient.measure} ${ingredient.name}</span>
+                            <button class="add-ingredient-to-shopping-btn ml-auto text-primary hover:text-opacity-80 transition duration-300" 
+                                data-name="${ingredient.name}" 
+                                data-amount="${ingredient.measure}" 
+                                data-category="Ingredients">
+                                <i class="fas fa-plus-circle"></i>
+                            </button>
                         </div>
                     `,
                       )
@@ -368,6 +383,17 @@ const UI = {
             `
                 : ""
             }
+            
+            <!-- User Reviews Section -->
+            <div class="mb-8">
+                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">User Reviews</h3>
+                <div id="reviews-container" class="space-y-4">
+                    <!-- Reviews will be loaded here -->
+                    <div class="text-center py-4 text-light-textLight dark:text-dark-textLight">
+                        <p>No reviews yet. Be the first to rate this recipe!</p>
+                    </div>
+                </div>
+            </div>
             
             ${
               recipe.source
@@ -398,7 +424,11 @@ const UI = {
     // Add share recipe event listener
     const shareBtn = this.elements.recipeDetailsContainer.querySelector(".share-recipe-btn")
     shareBtn.addEventListener("click", () => {
-      this.shareRecipe(recipe)
+      if (window.openSharingModal) {
+        window.openSharingModal(recipe.id, recipe.name, recipe.thumbnail)
+      } else {
+        this.shareRecipe(recipe)
+      }
     })
 
     // Add find restaurants event listener
@@ -417,7 +447,549 @@ const UI = {
       }
     })
 
+    // Add to shopping list event listener
+    const addToShoppingBtn = this.elements.recipeDetailsContainer.querySelector(".add-to-shopping-btn")
+    addToShoppingBtn.addEventListener("click", () => {
+      this.addRecipeToShoppingList(recipe)
+    })
+
+    // Add individual ingredients to shopping list
+    const addIngredientBtns = this.elements.recipeDetailsContainer.querySelectorAll(".add-ingredient-to-shopping-btn")
+    addIngredientBtns.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation()
+        const name = btn.getAttribute("data-name")
+        const amount = btn.getAttribute("data-amount")
+        const category = btn.getAttribute("data-category")
+
+        this.addIngredientToShoppingList(name, amount, category)
+
+        // Show feedback
+        const originalIcon = btn.innerHTML
+        btn.innerHTML = '<i class="fas fa-check"></i>'
+
+        setTimeout(() => {
+          btn.innerHTML = originalIcon
+        }, 1500)
+      })
+    })
+
+    // Rate recipe event listener
+    const rateRecipeBtn = this.elements.recipeDetailsContainer.querySelector(".rate-recipe-btn")
+    rateRecipeBtn.addEventListener("click", () => {
+      if (window.openRatingModal) {
+        window.openRatingModal(recipe.id, recipe.name)
+      }
+    })
+
+    // Load reviews
+    this.loadReviews(recipe.id)
+
     this.showView("recipe-details")
+  },
+
+  /**
+   * Add a recipe's ingredients to the shopping list
+   * @param {Object} recipe - Recipe object
+   */
+  addRecipeToShoppingList(recipe) {
+    // Get current shopping list
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Add each ingredient
+    recipe.ingredients.forEach((ingredient) => {
+      // Check if ingredient is already in the list
+      const existingItem = shoppingList.find((item) => item.name.toLowerCase() === ingredient.name.toLowerCase())
+
+      if (!existingItem) {
+        shoppingList.push({
+          id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+          name: ingredient.name,
+          amount: ingredient.measure,
+          category: "Ingredients",
+          checked: false,
+        })
+      }
+    })
+
+    // Save updated shopping list
+    localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
+
+    // Show confirmation
+    alert("Ingredients added to shopping list!")
+  },
+
+  /**
+   * Add a single ingredient to the shopping list
+   * @param {string} name - Ingredient name
+   * @param {string} amount - Ingredient amount
+   * @param {string} category - Ingredient category
+   */
+  addIngredientToShoppingList(name, amount, category) {
+    // Get current shopping list
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Check if ingredient is already in the list
+    const existingItem = shoppingList.find((item) => item.name.toLowerCase() === name.toLowerCase())
+
+    if (!existingItem) {
+      shoppingList.push({
+        id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+        name,
+        amount,
+        category,
+        checked: false,
+      })
+
+      // Save updated shopping list
+      localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
+    }
+  },
+
+  /**
+   * Load reviews for a recipe
+   * @param {string} recipeId - Recipe ID
+   */
+  loadReviews(recipeId) {
+    const reviewsContainer = document.getElementById("reviews-container")
+    if (!reviewsContainer) return
+
+    // Get ratings from localStorage
+    const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
+
+    // Check if this recipe has any ratings
+    if (!ratings[recipeId]) {
+      return
+    }
+
+    // Display the review
+    const review = ratings[recipeId]
+    const date = new Date(review.date)
+
+    reviewsContainer.innerHTML = `
+        <div class="bg-light-bg dark:bg-dark-bg rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+                <div class="text-highlight font-medium">
+                    ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}
+                    <span class="ml-2">${review.rating}.0</span>
+                </div>
+                <div class="text-sm text-light-textLight dark:text-dark-textLight">
+                    ${date.toLocaleDateString()}
+                </div>
+            </div>
+            ${
+              review.review
+                ? `
+                <p class="text-light-textLight dark:text-dark-textLight">${review.review}</p>
+            `
+                : ""
+            }
+        </div>
+    `
+  },
+
+  /**
+   * Format recipe instructions into steps
+   * @param {string} instructions - Recipe instructions text
+   * @returns {string} - Formatted HTML
+   */
+  formatInstructions(instructions) {
+    if (!instructions) return '<p class="text-light-textLight dark:text-dark-textLight">No instructions available.</p>'
+
+    // Split instructions by periods or by numbered steps
+    const steps = instructions
+      .split(/\.\s+/)
+      .filter((step) => step.trim().length > 0)
+      .map((step) => step.trim())
+
+    // Remove the last empty step if the instructions end with a period
+    if (steps[steps.length - 1] === "") {
+      steps.pop()
+    }
+
+    // If the last step doesn't end with a period, add one
+    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
+      steps[steps.length - 1] += "."
+    }
+
+    return steps
+      .map(
+        (step, index) => `
+            <div class="flex mb-4">
+                <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">
+                    ${index + 1}
+                </div>
+                <div class="flex-1 text-light-textLight dark:text-dark-textLight">
+                    ${step}
+                </div>
+            </div>
+        `,
+      )
+      .join("")
+  },
+
+  /**
+   * Toggle favorite status for a recipe
+   * @param {HTMLElement} button - Favorite button element
+   * @param {Object} recipe - Recipe object
+   */
+  toggleFavorite(button, recipe) {
+    if (Favorites.isFavorite(recipe.id)) {
+      Favorites.removeFavorite(recipe.id)
+      button.classList.remove("active")
+      button.textContent = "♡"
+    } else {
+      Favorites.addFavorite(recipe)
+      button.classList.add("active")
+      button.textContent = "♥"
+    }
+
+    // Update favorites view if it's currently visible
+    if (this.elements.views.favorites && this.elements.views.favorites.classList.contains("active")) {
+      this.renderFavorites(Favorites.getFavorites())
+    }
+  },
+
+  /**
+   * Print recipe
+   * @param {Object} recipe - Recipe object
+   */
+  printRecipe(recipe) {
+    const printWindow = window.open("", "_blank")
+
+    printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print Recipe - ${recipe.name}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    h1 {
+                        font-size: 24px;
+                        margin-bottom: 10px;
+                    }
+                    .meta {
+                        display: flex;
+                        gap: 20px;
+                        margin-bottom: 20px;
+                        color: #666;
+                    }
+                    .ingredients {
+                        margin-bottom: 30px;
+                    }
+                    .ingredients h2, .instructions h2 {
+                        font-size: 18px;
+                        margin-bottom: 10px;
+                        border-bottom: 1px solid #eee;
+                        padding-bottom: 5px;
+                    }
+                    .ingredients ul {
+                        padding-left: 20px;
+                    }
+                    .ingredients li {
+                        margin-bottom: 5px;
+                    }
+                    .step {
+                        margin-bottom: 15px;
+                    }
+                    .step-number {
+                        font-weight: bold;
+                        margin-right: 10px;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        font-size: 12px;
+                        color: #666;
+                        text-align: center;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>${recipe.name}</h1>
+                <div class="meta">
+                    <div>Category: ${recipe.category}</div>
+                    <div>Cooking Time: ${recipe.cookingTime} mins</div>
+                    <div>Rating: ${recipe.rating}/5</div>
+                </div>
+                
+                <div class="ingredients">
+                    <h2>Ingredients</h2>
+                    <ul>
+                        ${recipe.ingredients
+                          .map(
+                            (ingredient) => `
+                            <li>${ingredient.measure} ${ingredient.name}</li>
+                        `,
+                          )
+                          .join("")}
+                    </ul>
+                </div>
+                
+                <div class="instructions">
+                    <h2>Instructions</h2>
+                    ${this.formatPrintInstructions(recipe.instructions)}
+                </div>
+                
+                <div class="footer">
+                    <p>Recipe from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                </script>
+            </body>
+            </html>
+        `)
+
+    printWindow.document.close()
+  },
+
+  /**
+   * Format instructions for printing
+   * @param {string} instructions - Recipe instructions
+   * @returns {string} - Formatted HTML for printing
+   */
+  formatPrintInstructions(instructions) {
+    if (!instructions) return "<p>No instructions available.</p>"
+
+    // Split instructions by periods or by numbered steps
+    const steps = instructions
+      .split(/\.\s+/)
+      .filter((step) => step.trim().length > 0)
+      .map((step) => step.trim())
+
+    // Remove the last empty step if the instructions end with a period
+    if (steps[steps.length - 1] === "") {
+      steps.pop()
+    }
+
+    // If the last step doesn't end with a period, add one
+    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
+      steps[steps.length - 1] += "."
+    }
+
+    return steps
+      .map(
+        (step, index) => `
+            <div class="step">
+                <span class="step-number">${index + 1}.</span>
+                <span>${step}</span>
+            </div>
+        `,
+      )
+      .join("")
+  },
+
+  /**
+   * Share recipe
+   * @param {Object} recipe - Recipe object
+   */
+  shareRecipe(recipe) {
+    // Check if Web Share API is available
+    if (navigator.share) {
+      navigator
+        .share({
+          title: recipe.name,
+          text: `Check out this delicious ${recipe.name} recipe I found on Flavor Vault!`,
+          url: window.location.href,
+        })
+        .catch((error) => {
+          console.error("Error sharing recipe:", error)
+          this.showShareFallback(recipe)
+        })
+    } else {
+      this.showShareFallback(recipe)
+    }
+  },
+
+  /**
+   * Show fallback share options
+   * @param {Object} recipe - Recipe object
+   */
+  showShareFallback(recipe) {
+    // Create a temporary input to copy the URL
+    const input = document.createElement("input")
+    input.value = window.location.href
+    document.body.appendChild(input)
+    input.select()
+    document.execCommand("copy")
+    document.body.removeChild(input)
+
+    // Show a simple alert
+    alert("Link copied to clipboard! Share this recipe with your friends.")
+  },
+
+  /**
+   * Render category filter buttons
+   * @param {Array} categories - Array of category objects
+   * @param {Function} onCategorySelect - Callback function when a category is selected
+   */
+  renderCategoryFilters(categories, onCategorySelect) {
+    const categoryButtons = this.elements.categoryButtons
+    if (!categoryButtons) return
+
+    // Keep the "All" button
+    const allButton = categoryButtons.querySelector(".filter-btn")
+    categoryButtons.innerHTML = ""
+    categoryButtons.appendChild(allButton)
+
+    // Add category buttons
+    categories.forEach((category) => {
+      const button = document.createElement("button")
+      button.classList.add(
+        "filter-btn",
+        "bg-light-bg",
+        "dark:bg-dark-bg",
+        "border",
+        "border-light-border",
+        "dark:border-dark-border",
+        "px-4",
+        "py-2",
+        "rounded-md",
+        "font-medium",
+        "hover:bg-primary",
+        "hover:text-white",
+        "transition",
+        "duration-300",
+      )
+      button.setAttribute("data-category", category.name)
+      button.textContent = category.name
+
+      button.addEventListener("click", () => {
+        // Update active button
+        categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
+          btn.classList.remove("active", "bg-primary", "text-white")
+          btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+        })
+        button.classList.add("active", "bg-primary", "text-white")
+        button.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+
+        // Call the callback
+        onCategorySelect(category.name)
+      })
+
+      categoryButtons.appendChild(button)
+    })
+
+    // Add click event for "All" button
+    allButton.addEventListener("click", () => {
+      categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
+        btn.classList.remove("active", "bg-primary", "text-white")
+        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+      })
+      allButton.classList.add("active", "bg-primary", "text-white")
+      allButton.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+
+      onCategorySelect("all")
+    })
+  },
+
+  /**
+   * Add a recipe's ingredients to the shopping list
+   * @param {Object} recipe - Recipe object
+   */
+  addRecipeToShoppingList(recipe) {
+    // Get current shopping list
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Add each ingredient
+    recipe.ingredients.forEach((ingredient) => {
+      // Check if ingredient is already in the list
+      const existingItem = shoppingList.find((item) => item.name.toLowerCase() === ingredient.name.toLowerCase())
+
+      if (!existingItem) {
+        shoppingList.push({
+          id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+          name: ingredient.name,
+          amount: ingredient.measure,
+          category: "Ingredients",
+          checked: false,
+        })
+      }
+    })
+
+    // Save updated shopping list
+    localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
+
+    // Show confirmation
+    alert("Ingredients added to shopping list!")
+  },
+
+  /**
+   * Add a single ingredient to the shopping list
+   * @param {string} name - Ingredient name
+   * @param {string} amount - Ingredient amount
+   * @param {string} category - Ingredient category
+   */
+  addIngredientToShoppingList(name, amount, category) {
+    // Get current shopping list
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Check if ingredient is already in the list
+    const existingItem = shoppingList.find((item) => item.name.toLowerCase() === name.toLowerCase())
+
+    if (!existingItem) {
+      shoppingList.push({
+        id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+        name,
+        amount,
+        category,
+        checked: false,
+      })
+
+      // Save updated shopping list
+      localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
+    }
+  },
+
+  /**
+   * Load reviews for a recipe
+   * @param {string} recipeId - Recipe ID
+   */
+  loadReviews(recipeId) {
+    const reviewsContainer = document.getElementById("reviews-container")
+    if (!reviewsContainer) return
+
+    // Get ratings from localStorage
+    const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
+
+    // Check if this recipe has any ratings
+    if (!ratings[recipeId]) {
+      return
+    }
+
+    // Display the review
+    const review = ratings[recipeId]
+    const date = new Date(review.date)
+
+    reviewsContainer.innerHTML = `
+        <div class="bg-light-bg dark:bg-dark-bg rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+                <div class="text-highlight font-medium">
+                    ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}
+                    <span class="ml-2">${review.rating}.0</span>
+                </div>
+                <div class="text-sm text-light-textLight dark:text-dark-textLight">
+                    ${date.toLocaleDateString()}
+                </div>
+            </div>
+            ${
+              review.review
+                ? `
+                <p class="text-light-textLight dark:text-dark-textLight">${review.review}</p>
+            `
+                : ""
+            }
+        </div>
+    `
   },
 
   /**

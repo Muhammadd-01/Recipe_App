@@ -566,8 +566,839 @@ const App = {
   },
 }
 
-// Initialize app when DOM is loaded
+// Add user account functionality
+function initUserAccount() {
+  const userAccountBtn = document.getElementById("user-account-btn")
+  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
+  const loginModal = document.getElementById("login-modal")
+  const signupModal = document.getElementById("signup-modal")
+  const closeLoginModalBtn = document.getElementById("close-login-modal-btn")
+  const closeSignupModalBtn = document.getElementById("close-signup-modal-btn")
+  const showSignupBtn = document.getElementById("show-signup-btn")
+  const showLoginBtn = document.getElementById("show-login-btn")
+  const loginForm = document.getElementById("login-form")
+  const signupForm = document.getElementById("signup-form")
+
+  // Show login modal
+  if (userAccountBtn) {
+    userAccountBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  if (mobileUserAccountBtn) {
+    mobileUserAccountBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Close login modal
+  if (closeLoginModalBtn) {
+    closeLoginModalBtn.addEventListener("click", () => {
+      loginModal.classList.add("hidden")
+    })
+  }
+
+  // Close signup modal
+  if (closeSignupModalBtn) {
+    closeSignupModalBtn.addEventListener("click", () => {
+      signupModal.classList.add("hidden")
+    })
+  }
+
+  // Switch to signup modal
+  if (showSignupBtn) {
+    showSignupBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.add("hidden")
+      signupModal.classList.remove("hidden")
+    })
+  }
+
+  // Switch to login modal
+  if (showLoginBtn) {
+    showLoginBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      signupModal.classList.add("hidden")
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Handle login form submission
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+
+      // Get form data
+      const email = document.getElementById("login-email").value
+      const password = document.getElementById("login-password").value
+
+      // Simulate login (in a real app, this would call an API)
+      simulateLogin(email, password)
+    })
+  }
+
+  // Handle signup form submission
+  if (signupForm) {
+    signupForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+
+      // Get form data
+      const name = document.getElementById("signup-name").value
+      const email = document.getElementById("signup-email").value
+      const password = document.getElementById("signup-password").value
+      const confirmPassword = document.getElementById("signup-confirm-password").value
+
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        alert("Passwords do not match")
+        return
+      }
+
+      // Simulate signup (in a real app, this would call an API)
+      simulateSignup(name, email, password)
+    })
+  }
+
+  // Simulate login
+  function simulateLogin(email, password) {
+    // Show loading state
+    const submitButton = loginForm.querySelector('button[type="submit"]')
+    const originalText = submitButton.innerHTML
+    submitButton.disabled = true
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Signing In...'
+
+    // Simulate API call
+    setTimeout(() => {
+      // Store user data in localStorage (in a real app, this would be a JWT token)
+      const userData = {
+        email,
+        name: email.split("@")[0], // Use part of email as name for demo
+        isLoggedIn: true,
+      }
+
+      localStorage.setItem("user", JSON.stringify(userData))
+
+      // Update UI
+      updateUserUI(userData)
+
+      // Close modal
+      loginModal.classList.add("hidden")
+
+      // Reset form
+      loginForm.reset()
+
+      // Reset button
+      submitButton.disabled = false
+      submitButton.innerHTML = originalText
+    }, 1500)
+  }
+
+  // Simulate signup
+  function simulateSignup(name, email, password) {
+    // Show loading state
+    const submitButton = signupForm.querySelector('button[type="submit"]')
+    const originalText = submitButton.innerHTML
+    submitButton.disabled = true
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creating Account...'
+
+    // Simulate API call
+    setTimeout(() => {
+      // Store user data in localStorage (in a real app, this would be a JWT token)
+      const userData = {
+        email,
+        name,
+        isLoggedIn: true,
+      }
+
+      localStorage.setItem("user", JSON.stringify(userData))
+
+      // Update UI
+      updateUserUI(userData)
+
+      // Close modal
+      signupModal.classList.add("hidden")
+
+      // Reset form
+      signupForm.reset()
+
+      // Reset button
+      submitButton.disabled = false
+      submitButton.innerHTML = originalText
+    }, 1500)
+  }
+
+  // Update UI based on user login state
+  function updateUserUI(userData) {
+    if (userData && userData.isLoggedIn) {
+      // Update account button text
+      if (userAccountBtn) {
+        userAccountBtn.innerHTML = `<i class="fas fa-user mr-1"></i> ${userData.name}`
+      }
+
+      if (mobileUserAccountBtn) {
+        mobileUserAccountBtn.innerHTML = `<i class="fas fa-user mr-1"></i> ${userData.name}`
+      }
+    } else {
+      // Reset account button text
+      if (userAccountBtn) {
+        userAccountBtn.innerHTML = `<i class="fas fa-user mr-1"></i> Account`
+      }
+
+      if (mobileUserAccountBtn) {
+        mobileUserAccountBtn.innerHTML = `<i class="fas fa-user mr-1"></i> Account`
+      }
+    }
+  }
+
+  // Check if user is already logged in
+  const userData = JSON.parse(localStorage.getItem("user") || "null")
+  updateUserUI(userData)
+}
+
+// Add shopping list functionality
+function initShoppingList() {
+  const shoppingListModal = document.getElementById("shopping-list-modal")
+  const closeShoppingListModalBtn = document.getElementById("close-shopping-list-modal-btn")
+  const clearShoppingListBtn = document.getElementById("clear-shopping-list-btn")
+  const printShoppingListBtn = document.getElementById("print-shopping-list-btn")
+  const shoppingListContainer = document.getElementById("shopping-list-container")
+
+  // Close shopping list modal
+  if (closeShoppingListModalBtn) {
+    closeShoppingListModalBtn.addEventListener("click", () => {
+      shoppingListModal.classList.add("hidden")
+    })
+  }
+
+  // Clear shopping list
+  if (clearShoppingListBtn) {
+    clearShoppingListBtn.addEventListener("click", () => {
+      localStorage.removeItem("shopping-list")
+      renderShoppingList()
+    })
+  }
+
+  // Print shopping list
+  if (printShoppingListBtn) {
+    printShoppingListBtn.addEventListener("click", () => {
+      printShoppingList()
+    })
+  }
+
+  // Render shopping list
+  function renderShoppingList() {
+    if (!shoppingListContainer) return
+
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    if (shoppingList.length === 0) {
+      shoppingListContainer.innerHTML = `
+                <div class="text-center py-8 text-light-textLight dark:text-dark-textLight">
+                    <i class="fas fa-shopping-basket text-5xl mb-4"></i>
+                    <p class="text-lg">Your shopping list is empty</p>
+                    <p class="mb-4">Add ingredients from recipes to create your shopping list</p>
+                </div>
+            `
+      return
+    }
+
+    // Group items by category
+    const groupedItems = {}
+
+    shoppingList.forEach((item) => {
+      if (!groupedItems[item.category]) {
+        groupedItems[item.category] = []
+      }
+
+      groupedItems[item.category].push(item)
+    })
+
+    // Render grouped items
+    let html = ""
+
+    Object.keys(groupedItems).forEach((category) => {
+      html += `
+                <div class="mb-4">
+                    <h4 class="font-heading font-bold text-lg mb-2 dark:text-dark-text">${category}</h4>
+                    <ul class="space-y-2">
+            `
+
+      groupedItems[category].forEach((item) => {
+        html += `
+                    <li class="flex items-center">
+                        <input type="checkbox" class="shopping-item-checkbox mr-2" data-id="${item.id}">
+                        <span class="flex-1 dark:text-dark-text">${item.amount ? item.amount + " " : ""}${item.name}</span>
+                        <button class="remove-shopping-item-btn text-red-500 hover:text-red-700 transition duration-300" data-id="${item.id}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </li>
+                `
+      })
+
+      html += `
+                    </ul>
+                </div>
+            `
+    })
+
+    shoppingListContainer.innerHTML = html
+
+    // Add event listeners to checkboxes
+    const checkboxes = shoppingListContainer.querySelectorAll(".shopping-item-checkbox")
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        const itemId = checkbox.getAttribute("data-id")
+        toggleShoppingItem(itemId, checkbox.checked)
+      })
+    })
+
+    // Add event listeners to remove buttons
+    const removeButtons = shoppingListContainer.querySelectorAll(".remove-shopping-item-btn")
+    removeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const itemId = button.getAttribute("data-id")
+        removeShoppingItem(itemId)
+      })
+    })
+  }
+
+  // Toggle shopping item checked state
+  function toggleShoppingItem(itemId, isChecked) {
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    const updatedList = shoppingList.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, checked: isChecked }
+      }
+      return item
+    })
+
+    localStorage.setItem("shopping-list", JSON.stringify(updatedList))
+  }
+
+  // Remove shopping item
+  function removeShoppingItem(itemId) {
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    const updatedList = shoppingList.filter((item) => item.id !== itemId)
+
+    localStorage.setItem("shopping-list", JSON.stringify(updatedList))
+
+    renderShoppingList()
+  }
+
+  // Print shopping list
+  function printShoppingList() {
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    if (shoppingList.length === 0) {
+      alert("Your shopping list is empty")
+      return
+    }
+
+    // Group items by category
+    const groupedItems = {}
+
+    shoppingList.forEach((item) => {
+      if (!groupedItems[item.category]) {
+        groupedItems[item.category] = []
+      }
+
+      groupedItems[item.category].push(item)
+    })
+
+    // Create print window
+    const printWindow = window.open("", "_blank")
+
+    printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Shopping List - Flavor Vault</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                    }
+                    h1 {
+                        font-size: 24px;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    h2 {
+                        font-size: 18px;
+                        margin-top: 20px;
+                        margin-bottom: 10px;
+                        border-bottom: 1px solid #eee;
+                        padding-bottom: 5px;
+                    }
+                    ul {
+                        list-style-type: square;
+                        padding-left: 20px;
+                    }
+                    li {
+                        margin-bottom: 5px;
+                    }
+                    .checked {
+                        text-decoration: line-through;
+                        color: #999;
+                    }
+                    .footer {
+                        margin-top: 30px;
+                        font-size: 12px;
+                        color: #666;
+                        text-align: center;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Shopping List</h1>
+        `)
+
+    // Add categories and items
+    Object.keys(groupedItems).forEach((category) => {
+      printWindow.document.write(`
+                <h2>${category}</h2>
+                <ul>
+            `)
+
+      groupedItems[category].forEach((item) => {
+        printWindow.document.write(`
+                    <li class="${item.checked ? "checked" : ""}">${item.amount ? item.amount + " " : ""}${item.name}</li>
+                `)
+      })
+
+      printWindow.document.write(`
+                </ul>
+            `)
+    })
+
+    printWindow.document.write(`
+                <div class="footer">
+                    <p>Shopping List from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    }
+                </script>
+            </body>
+            </html>
+        `)
+
+    printWindow.document.close()
+  }
+
+  // Initialize shopping list
+  renderShoppingList()
+}
+
+// Add recipe submission functionality
+function initRecipeSubmission() {
+  const submitRecipeModal = document.getElementById("submit-recipe-modal")
+  const closeSubmitRecipeModalBtn = document.getElementById("close-submit-recipe-modal-btn")
+  const submitRecipeForm = document.getElementById("submit-recipe-form")
+  const addIngredientBtn = document.getElementById("add-ingredient-btn")
+  const ingredientsContainer = document.getElementById("ingredients-container")
+
+  // Close submit recipe modal
+  if (closeSubmitRecipeModalBtn) {
+    closeSubmitRecipeModalBtn.addEventListener("click", () => {
+      submitRecipeModal.classList.add("hidden")
+    })
+  }
+
+  // Add ingredient
+  if (addIngredientBtn) {
+    addIngredientBtn.addEventListener("click", () => {
+      addIngredientField()
+    })
+  }
+
+  // Add ingredient field
+  function addIngredientField() {
+    if (!ingredientsContainer) return
+
+    const ingredientField = document.createElement("div")
+    ingredientField.className = "flex items-center space-x-2"
+    ingredientField.innerHTML = `
+            <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+            <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+            <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
+                <i class="fas fa-times"></i>
+            </button>
+        `
+
+    ingredientsContainer.appendChild(ingredientField)
+
+    // Add event listener to remove button
+    const removeButton = ingredientField.querySelector(".remove-ingredient-btn")
+    removeButton.addEventListener("click", () => {
+      ingredientField.remove()
+    })
+  }
+
+  // Handle recipe submission
+  if (submitRecipeForm) {
+    submitRecipeForm.addEventListener("submit", (e) => {
+      e.preventDefault()
+
+      // Get form data
+      const name = document.getElementById("recipe-name").value
+      const category = document.getElementById("recipe-category").value
+      const description = document.getElementById("recipe-description").value
+      const instructions = document.getElementById("recipe-instructions").value
+      const imageFile = document.getElementById("recipe-image").files[0]
+
+      // Get ingredients
+      const ingredients = []
+      const ingredientAmounts = ingredientsContainer.querySelectorAll(".ingredient-amount")
+      const ingredientNames = ingredientsContainer.querySelectorAll(".ingredient-name")
+
+      for (let i = 0; i < ingredientNames.length; i++) {
+        const amount = ingredientAmounts[i].value
+        const name = ingredientNames[i].value
+
+        if (name.trim()) {
+          ingredients.push({
+            amount,
+            name,
+          })
+        }
+      }
+
+      // Validate form
+      if (!name || !category || !description || !instructions || ingredients.length === 0) {
+        alert("Please fill in all required fields")
+        return
+      }
+
+      // Simulate recipe submission (in a real app, this would call an API)
+      simulateRecipeSubmission(name, category, description, instructions, ingredients, imageFile)
+    })
+  }
+
+  // Simulate recipe submission
+  function simulateRecipeSubmission(name, category, description, instructions, ingredients, imageFile) {
+    // Show loading state
+    const submitButton = submitRecipeForm.querySelector('button[type="submit"]')
+    const originalText = submitButton.innerHTML
+    submitButton.disabled = true
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...'
+
+    // Simulate API call
+    setTimeout(() => {
+      // Create recipe object
+      const recipe = {
+        id: "user-" + Date.now(),
+        name,
+        category,
+        description,
+        instructions,
+        ingredients,
+        thumbnail: imageFile ? URL.createObjectURL(imageFile) : "/placeholder.svg?height=300&width=300",
+        rating: "0.0",
+        cookingTime: Math.floor(Math.random() * 30) + 15, // Random cooking time between 15-45 minutes
+        area: "User Submitted",
+        source: "",
+        youtube: "",
+        tags: [category, "User Submitted"],
+      }
+
+      // Store recipe in localStorage
+      const userRecipes = JSON.parse(localStorage.getItem("user-recipes") || "[]")
+      userRecipes.push(recipe)
+      localStorage.setItem("user-recipes", JSON.stringify(userRecipes))
+
+      // Show success message
+      alert("Recipe submitted successfully!")
+
+      // Close modal
+      submitRecipeModal.classList.add("hidden")
+
+      // Reset form
+      submitRecipeForm.reset()
+
+      // Clear ingredients
+      ingredientsContainer.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+                    <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
+                    <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `
+
+      // Reset button
+      submitButton.disabled = false
+      submitButton.innerHTML = originalText
+    }, 2000)
+  }
+}
+
+// Add recipe rating functionality
+function initRecipeRating() {
+  const rateRecipeModal = document.getElementById("rate-recipe-modal")
+  const closeRateRecipeModalBtn = document.getElementById("close-rate-recipe-modal-btn")
+  const stars = document.querySelectorAll(".star")
+  const ratingText = document.getElementById("rating-text")
+  const submitRatingBtn = document.getElementById("submit-rating-btn")
+
+  let currentRating = 0
+  let currentRecipeId = null
+
+  // Close rate recipe modal
+  if (closeRateRecipeModalBtn) {
+    closeRateRecipeModalBtn.addEventListener("click", () => {
+      rateRecipeModal.classList.add("hidden")
+    })
+  }
+
+  // Handle star rating
+  if (stars.length > 0) {
+    stars.forEach((star) => {
+      // Hover effect
+      star.addEventListener("mouseover", () => {
+        const rating = Number.parseInt(star.getAttribute("data-rating"))
+        highlightStars(rating)
+        updateRatingText(rating)
+      })
+
+      // Click to set rating
+      star.addEventListener("click", () => {
+        currentRating = Number.parseInt(star.getAttribute("data-rating"))
+        highlightStars(currentRating)
+        updateRatingText(currentRating)
+      })
+    })
+
+    // Reset on mouseout
+    document.querySelector(".star").parentElement.addEventListener("mouseout", () => {
+      highlightStars(currentRating)
+      updateRatingText(currentRating)
+    })
+  }
+
+  // Highlight stars up to rating
+  function highlightStars(rating) {
+    stars.forEach((star) => {
+      const starRating = Number.parseInt(star.getAttribute("data-rating"))
+      if (starRating <= rating) {
+        star.classList.add("text-highlight")
+        star.classList.remove("text-gray-300")
+      } else {
+        star.classList.remove("text-highlight")
+        star.classList.add("text-gray-300")
+      }
+    })
+  }
+
+  // Update rating text
+  function updateRatingText(rating) {
+    if (!ratingText) return
+
+    if (rating === 0) {
+      ratingText.textContent = "Select a rating"
+    } else {
+      const ratingTexts = ["", "Poor", "Fair", "Good", "Very Good", "Excellent"]
+
+      ratingText.textContent = `${ratingTexts[rating]} (${rating} star${rating !== 1 ? "s" : ""})`
+    }
+  }
+
+  // Handle rating submission
+  if (submitRatingBtn) {
+    submitRatingBtn.addEventListener("click", () => {
+      if (currentRating === 0) {
+        alert("Please select a rating")
+        return
+      }
+
+      const reviewText = document.getElementById("review-text").value
+
+      // Simulate rating submission (in a real app, this would call an API)
+      simulateRatingSubmission(currentRecipeId, currentRating, reviewText)
+    })
+  }
+
+  // Simulate rating submission
+  function simulateRatingSubmission(recipeId, rating, reviewText) {
+    // Show loading state
+    const submitButton = submitRatingBtn
+    const originalText = submitButton.innerHTML
+    submitButton.disabled = true
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...'
+
+    // Simulate API call
+    setTimeout(() => {
+      // Store rating in localStorage
+      const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
+
+      ratings[recipeId] = {
+        rating,
+        review: reviewText,
+        date: new Date().toISOString(),
+      }
+
+      localStorage.setItem("recipe-ratings", JSON.stringify(ratings))
+
+      // Show success message
+      alert("Rating submitted successfully!")
+
+      // Close modal
+      rateRecipeModal.classList.add("hidden")
+
+      // Reset form
+      currentRating = 0
+      highlightStars(0)
+      updateRatingText(0)
+      document.getElementById("review-text").value = ""
+
+      // Reset button
+      submitButton.disabled = false
+      submitButton.innerHTML = originalText
+    }, 1500)
+  }
+
+  // Open rating modal for a recipe
+  window.openRatingModal = (recipeId, recipeName) => {
+    if (!rateRecipeModal) return
+
+    currentRecipeId = recipeId
+
+    // Set recipe name
+    const recipeNameElement = document.getElementById("rate-recipe-name")
+    if (recipeNameElement) {
+      recipeNameElement.textContent = recipeName
+    }
+
+    // Check if user has already rated this recipe
+    const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
+    if (ratings[recipeId]) {
+      currentRating = ratings[recipeId].rating
+      highlightStars(currentRating)
+      updateRatingText(currentRating)
+
+      if (ratings[recipeId].review) {
+        document.getElementById("review-text").value = ratings[recipeId].review
+      }
+    } else {
+      currentRating = 0
+      highlightStars(0)
+      updateRatingText(0)
+      document.getElementById("review-text").value = ""
+    }
+
+    // Show modal
+    rateRecipeModal.classList.remove("hidden")
+  }
+}
+
+// Add enhanced social sharing functionality
+function initSocialSharing() {
+  const shareRecipeModal = document.getElementById("share-recipe-modal")
+  const closeShareRecipeModalBtn = document.getElementById("close-share-recipe-modal-btn")
+  const copyLinkBtn = document.getElementById("copy-link-btn")
+
+  // Close share recipe modal
+  if (closeShareRecipeModalBtn) {
+    closeShareRecipeModalBtn.addEventListener("click", () => {
+      shareRecipeModal.classList.add("hidden")
+    })
+  }
+
+  // Copy link to clipboard
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener("click", () => {
+      const linkInput = document.getElementById("share-link")
+      if (!linkInput) return
+
+      linkInput.select()
+      document.execCommand("copy")
+
+      // Show copied message
+      const originalText = copyLinkBtn.innerHTML
+      copyLinkBtn.innerHTML = '<i class="fas fa-check"></i>'
+
+      setTimeout(() => {
+        copyLinkBtn.innerHTML = originalText
+      }, 2000)
+    })
+  }
+
+  // Open sharing modal for a recipe
+  window.openSharingModal = (recipeId, recipeName, recipeImage) => {
+    if (!shareRecipeModal) return
+
+    // Set recipe name
+    const recipeNameElement = document.getElementById("share-recipe-name")
+    if (recipeNameElement) {
+      recipeNameElement.textContent = recipeName
+    }
+
+    // Set share link
+    const shareLink = document.getElementById("share-link")
+    if (shareLink) {
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      shareLink.value = url
+    }
+
+    // Set up social sharing links
+    const facebookShare = document.getElementById("share-facebook")
+    const twitterShare = document.getElementById("share-twitter")
+    const pinterestShare = document.getElementById("share-pinterest")
+    const emailShare = document.getElementById("share-email")
+
+    if (facebookShare) {
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+      facebookShare.target = "_blank"
+    }
+
+    if (twitterShare) {
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      const text = `Check out this delicious ${recipeName} recipe I found on Flavor Vault!`
+      twitterShare.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
+      twitterShare.target = "_blank"
+    }
+
+    if (pinterestShare) {
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      const description = `Check out this delicious ${recipeName} recipe I found on Flavor Vault!`
+      pinterestShare.href = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(recipeImage)}&description=${encodeURIComponent(description)}`
+      pinterestShare.target = "_blank"
+    }
+
+    if (emailShare) {
+      const url = `${window.location.origin}${window.location.pathname}?recipe=${recipeId}`
+      const subject = `Check out this ${recipeName} recipe`
+      const body = `I found this delicious ${recipeName} recipe on Flavor Vault that I thought you might enjoy:\n\n${url}`
+      emailShare.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    }
+
+    // Show modal
+    shareRecipeModal.classList.remove("hidden")
+  }
+}
+
+// Initialize all new features
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize existing features
   App.init()
+
+  // Initialize new features
+  initUserAccount()
+  initShoppingList()
+  initRecipeSubmission()
+  initRecipeRating()
+  initSocialSharing()
 })
 
