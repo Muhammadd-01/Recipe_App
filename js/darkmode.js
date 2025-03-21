@@ -8,11 +8,15 @@ const DarkMode = {
    * Initialize dark mode
    */
   init() {
+    console.log("Initializing Dark Mode")
+
     // Get all theme toggle inputs
     const toggleInputs = [
       document.getElementById("theme-toggle"),
       document.getElementById("mobile-theme-toggle"),
     ].filter((input) => input !== null)
+
+    console.log("Found toggle inputs:", toggleInputs.length)
 
     // Set initial state based on localStorage or user preference
     this.setInitialTheme()
@@ -27,6 +31,7 @@ const DarkMode = {
 
         // Add event listener for theme toggle
         input.addEventListener("change", () => {
+          console.log("Toggle changed, current state:", input.checked)
           this.toggleTheme()
 
           // Update all toggles to match
@@ -82,6 +87,7 @@ const DarkMode = {
    */
   setInitialTheme() {
     const savedTheme = localStorage.getItem(this.storageKey)
+    console.log("Saved theme:", savedTheme)
 
     if (savedTheme) {
       // Use saved theme preference
@@ -93,6 +99,7 @@ const DarkMode = {
     } else {
       // Check for system preference
       const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      console.log("System prefers dark:", prefersDark)
 
       if (prefersDark) {
         this.applyDarkMode()
@@ -126,6 +133,7 @@ const DarkMode = {
    * Apply dark mode to all necessary elements
    */
   applyDarkMode() {
+    console.log("Applying dark mode")
     document.documentElement.classList.add("dark")
     document.body.classList.add("dark")
 
@@ -140,6 +148,7 @@ const DarkMode = {
    * Remove dark mode from all necessary elements
    */
   removeDarkMode() {
+    console.log("Removing dark mode")
     document.documentElement.classList.remove("dark")
     document.body.classList.remove("dark")
 
@@ -154,6 +163,7 @@ const DarkMode = {
    * Toggle between light and dark theme
    */
   toggleTheme() {
+    console.log("Toggling theme, current state:", this.isDarkMode())
     if (this.isDarkMode()) {
       this.removeDarkMode()
       localStorage.setItem(this.storageKey, "light")

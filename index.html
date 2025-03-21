@@ -249,6 +249,33 @@
         </div>
     </section>
 
+<!-- Add these buttons right after the Hero Section -->
+<section class="bg-white dark:bg-dark-card py-6 shadow-sm">
+    <div class="container mx-auto px-4">
+        <h3 class="font-heading text-xl mb-4 dark:text-dark-text">Quick Actions</h3>
+        <div class="flex flex-wrap gap-3">
+            <button id="show-account-modal-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-user mr-2"></i> Account
+            </button>
+            <button id="show-shopping-list-modal-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-shopping-basket mr-2"></i> Shopping List
+            </button>
+            <button id="show-submit-recipe-modal-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-plus-circle mr-2"></i> Submit Recipe
+            </button>
+            <button id="show-rate-recipe-modal-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-star mr-2"></i> Rate Recipe
+            </button>
+            <button id="show-share-recipe-modal-btn" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-share-alt mr-2"></i> Share Recipe
+            </button>
+            <button id="toggle-dark-mode-btn" class="bg-accent text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition duration-300">
+                <i class="fas fa-moon mr-2"></i> Toggle Dark Mode
+            </button>
+        </div>
+    </div>
+</section>
+
     <!-- Category Filter -->
     <section class="bg-white dark:bg-dark-card py-8 shadow-sm">
         <div class="container mx-auto px-4">
@@ -550,7 +577,7 @@
         </div>
     </div>
 
-    <!-- Recipe Rating Modal -->
+    <!-- Add Recipe Rating Modal -->
     <div id="rate-recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
             <div class="flex justify-between items-center mb-4">
@@ -583,7 +610,7 @@
         </div>
     </div>
 
-    <!-- Enhanced Social Sharing Modal -->
+    <!-- Add Enhanced Social Sharing Modal -->
     <div id="share-recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
             <div class="flex justify-between items-center mb-4">
@@ -818,126 +845,5 @@
                 
                 <div>
                     <label for="recipe-description" class="block mb-2 font-medium dark:text-dark-text">Description</label>
-                    <textarea id="recipe-description" rows="3" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary" required></textarea>
-                </div>
-                
-                <div>
-                    <label class="block mb-2 font-medium dark:text-dark-text">Ingredients</label>
-                    <div id="ingredients-container" class="space-y-3">
-                        <div class="flex items-center space-x-2">
-                            <input type="text" placeholder="Amount" class="ingredient-amount w-1/4 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-                            <input type="text" placeholder="Ingredient" class="ingredient-name flex-1 px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-                            <button type="button" class="remove-ingredient-btn px-2 py-2 text-red-500 hover:text-red-700 transition duration-300">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" id="add-ingredient-btn" class="mt-2 text-primary hover:text-opacity-80 transition duration-300">
-                        <i class="fas fa-plus mr-1"></i> Add Ingredient
-                    </button>
-                </div>
-                
-                <div>
-                    <label for="recipe-instructions" class="block mb-2 font-medium dark:text-dark-text">Instructions</label>
-                    <textarea id="recipe-instructions" rows="6" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary" required></textarea>
-                </div>
-                
-                <div>
-                    <label for="recipe-image" class="block mb-2 font-medium dark:text-dark-text">Recipe Image</label>
-                    <input type="file" id="recipe-image" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary">
-                </div>
-                
-                <button type="submit" class="w-full bg-primary text-white font-medium py-3 px-6 rounded-md hover:bg-opacity-90 transition duration-300">
-                    Submit Recipe
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Add Recipe Rating Modal -->
-    <div id="rate-recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-heading text-xl font-bold dark:text-dark-text">Rate This Recipe</h3>
-                <button id="close-rate-recipe-modal-btn" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="text-center mb-6">
-                <h4 id="rate-recipe-name" class="font-heading text-lg font-bold mb-4 dark:text-dark-text">Recipe Name</h4>
-                <div class="flex justify-center space-x-2 text-2xl mb-4">
-                    <span class="star cursor-pointer text-gray-300 hover:text-highlight" data-rating="1">★</span>
-                    <span class="star cursor-pointer text-gray-300 hover:text-highlight" data-rating="2">★</span>
-                    <span class="star cursor-pointer text-gray-300 hover:text-highlight" data-rating="3">★</span>
-                    <span class="star cursor-pointer text-gray-300 hover:text-highlight" data-rating="4">★</span>
-                    <span class="star cursor-pointer text-gray-300 hover:text-highlight" data-rating="5">★</span>
-                </div>
-                <p id="rating-text" class="text-light-textLight dark:text-dark-textLight">Select a rating</p>
-            </div>
-            
-            <div>
-                <label for="review-text" class="block mb-2 font-medium dark:text-dark-text">Your Review (Optional)</label>
-                <textarea id="review-text" rows="4" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-            </div>
-            
-            <button id="submit-rating-btn" class="w-full mt-4 bg-primary text-white font-medium py-2 px-4 rounded-md hover:bg-opacity-90 transition duration-300">
-                Submit Rating
-            </button>
-        </div>
-    </div>
-
-    <!-- Add Enhanced Social Sharing Modal -->
-    <div id="share-recipe-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white dark:bg-dark-card rounded-xl max-w-md w-full p-6 animate-fade-in">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-heading text-xl font-bold dark:text-dark-text">Share This Recipe</h3>
-                <button id="close-share-recipe-modal-btn" class="text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <div class="text-center mb-6">
-                <h4 id="share-recipe-name" class="font-heading text-lg font-bold mb-4 dark:text-dark-text">Recipe Name</h4>
-                <div class="grid grid-cols-4 gap-4 mb-6">
-                    <a href="#" id="share-facebook" class="flex flex-col items-center p-3 bg-light-bg dark:bg-dark-bg rounded-lg hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
-                        <i class="fab fa-facebook-f text-2xl text-[#3b5998] mb-2"></i>
-                        <span class="text-xs font-medium dark:text-dark-text">Facebook</span>
-                    </a>
-                    <a href="#" id="share-twitter" class="flex flex-col items-center p-3 bg-light-bg dark:bg-dark-bg rounded-lg hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
-                        <i class="fab fa-twitter text-2xl text-[#1da1f2] mb-2"></i>
-                        <span class="text-xs font-medium dark:text-dark-text">Twitter</span>
-                    </a>
-                    <a href="#" id="share-pinterest" class="flex flex-col items-center p-3 bg-light-bg dark:bg-dark-bg rounded-lg hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
-                        <i class="fab fa-pinterest text-2xl text-[#bd081c] mb-2"></i>
-                        <span class="text-xs font-medium dark:text-dark-text">Pinterest</span>
-                    </a>
-                    <a href="#" id="share-email" class="flex flex-col items-center p-3 bg-light-bg dark:bg-dark-bg rounded-lg hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
-                        <i class="fas fa-envelope text-2xl text-gray-600 dark:text-gray-400 mb-2"></i>
-                        <span class="text-xs font-medium dark:text-dark-text">Email</span>
-                    </a>
-                </div>
-                
-                <div>
-                    <label for="share-link" class="block mb-2 font-medium text-left dark:text-dark-text">Recipe Link</label>
-                    <div class="flex">
-                        <input type="text" id="share-link" class="flex-1 px-4 py-2 rounded-l-md border border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text focus:outline-none" readonly>
-                        <button id="copy-link-btn" class="bg-primary text-white px-4 py-2 rounded-r-md hover:bg-opacity-90 transition duration-300">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/api.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/favorites.js"></script>
-    <script src="js/darkMode.js"></script>
-    <script src="js/search.js"></script>
-    <script src="js/app.js"></script>
-</body>
-</html>
+                    <textarea id="recipe-description" rows="3" class="w-full px-4 py-2 rounded-md border border-light-border dark:border-dark-border bg-light-bg dark
 

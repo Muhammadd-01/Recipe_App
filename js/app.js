@@ -1393,113 +1393,155 @@ function initSocialSharing() {
 
 // Show modals when buttons are clicked
 function setupModalTriggers() {
-  // User account modal triggers
-  const userAccountBtn = document.getElementById("user-account-btn")
-  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
+  console.log("Setting up modal triggers")
+
+  // Direct modal buttons
+  const showAccountModalBtn = document.getElementById("show-account-modal-btn")
+  const showShoppingListModalBtn = document.getElementById("show-shopping-list-modal-btn")
+  const showSubmitRecipeModalBtn = document.getElementById("show-submit-recipe-modal-btn")
+  const showRateRecipeModalBtn = document.getElementById("show-rate-recipe-modal-btn")
+  const showShareRecipeModalBtn = document.getElementById("show-share-recipe-modal-btn")
+  const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
+
+  // Get modals
   const loginModal = document.getElementById("login-modal")
-
-  if (userAccountBtn && loginModal) {
-    userAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  if (mobileUserAccountBtn && loginModal) {
-    mobileUserAccountBtn.addEventListener("click", (e) => {
-      e.preventDefault()
-      loginModal.classList.remove("hidden")
-    })
-  }
-
-  // Shopping list modal trigger
-  const shoppingListBtn = document.getElementById("shopping-list-btn")
   const shoppingListModal = document.getElementById("shopping-list-modal")
+  const submitRecipeModal = document.getElementById("submit-recipe-modal")
+  const rateRecipeModal = document.getElementById("rate-recipe-modal")
+  const shareRecipeModal = document.getElementById("share-recipe-modal")
 
-  if (shoppingListBtn && shoppingListModal) {
-    shoppingListBtn.addEventListener("click", (e) => {
-      e.preventDefault()
+  console.log("Modals found:", {
+    loginModal: !!loginModal,
+    shoppingListModal: !!shoppingListModal,
+    submitRecipeModal: !!submitRecipeModal,
+    rateRecipeModal: !!rateRecipeModal,
+    shareRecipeModal: !!shareRecipeModal,
+  })
+
+  // Account modal button
+  if (showAccountModalBtn && loginModal) {
+    showAccountModalBtn.addEventListener("click", () => {
+      console.log("Opening account modal")
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Shopping list modal button
+  if (showShoppingListModalBtn && shoppingListModal) {
+    showShoppingListModalBtn.addEventListener("click", () => {
+      console.log("Opening shopping list modal")
       shoppingListModal.classList.remove("hidden")
     })
   }
 
-  // Add shopping list button to header
-  const navLinks = document.querySelector('.nav-link[data-view="favorites"]')
-  if (navLinks && !document.getElementById("shopping-list-btn")) {
-    const shoppingListNavLink = document.createElement("a")
-    shoppingListNavLink.href = "#"
-    shoppingListNavLink.id = "shopping-list-btn"
-    shoppingListNavLink.className = "nav-link"
-    shoppingListNavLink.innerHTML = '<i class="fas fa-shopping-basket mr-1"></i> Shopping List'
-    navLinks.parentNode.insertBefore(shoppingListNavLink, navLinks.nextSibling)
-
-    shoppingListNavLink.addEventListener("click", (e) => {
-      e.preventDefault()
-      if (shoppingListModal) {
-        shoppingListModal.classList.remove("hidden")
-      }
-    })
-  }
-
-  // Add mobile shopping list button
-  const mobileNavLinks = document.querySelector('.mobile-nav-link[data-view="favorites"]')
-  if (mobileNavLinks && !document.getElementById("mobile-shopping-list-btn")) {
-    const mobileShoppingListNavLink = document.createElement("a")
-    mobileShoppingListNavLink.href = "#"
-    mobileShoppingListNavLink.id = "mobile-shopping-list-btn"
-    mobileShoppingListNavLink.className = "mobile-nav-link py-2 px-4 rounded"
-    mobileShoppingListNavLink.innerHTML = '<i class="fas fa-shopping-basket mr-1"></i> Shopping List'
-    mobileNavLinks.parentNode.insertBefore(mobileShoppingListNavLink, mobileNavLinks.nextSibling)
-
-    mobileShoppingListNavLink.addEventListener("click", (e) => {
-      e.preventDefault()
-      if (shoppingListModal) {
-        shoppingListModal.classList.remove("hidden")
-      }
-    })
-  }
-
-  // Recipe submission modal trigger
-  const submitRecipeBtn = document.createElement("a")
-  submitRecipeBtn.href = "#"
-  submitRecipeBtn.id = "submit-recipe-btn"
-  submitRecipeBtn.className = "nav-link"
-  submitRecipeBtn.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Submit Recipe'
-
-  if (navLinks) {
-    navLinks.parentNode.insertBefore(submitRecipeBtn, navLinks.nextSibling.nextSibling)
-  }
-
-  const submitRecipeModal = document.getElementById("submit-recipe-modal")
-
-  if (submitRecipeBtn && submitRecipeModal) {
-    submitRecipeBtn.addEventListener("click", (e) => {
-      e.preventDefault()
+  // Submit recipe modal button
+  if (showSubmitRecipeModalBtn && submitRecipeModal) {
+    showSubmitRecipeModalBtn.addEventListener("click", () => {
+      console.log("Opening submit recipe modal")
       submitRecipeModal.classList.remove("hidden")
     })
   }
 
-  // Add mobile submit recipe button
-  const mobileSubmitRecipeBtn = document.createElement("a")
-  mobileSubmitRecipeBtn.href = "#"
-  mobileSubmitRecipeBtn.id = "mobile-submit-recipe-btn"
-  mobileSubmitRecipeBtn.className = "mobile-nav-link py-2 px-4 rounded"
-  mobileSubmitRecipeBtn.innerHTML = '<i class="fas fa-plus-circle mr-1"></i> Submit Recipe'
-
-  if (mobileNavLinks) {
-    mobileNavLinks.parentNode.insertBefore(mobileSubmitRecipeBtn, mobileNavLinks.nextSibling.nextSibling)
+  // Rate recipe modal button
+  if (showRateRecipeModalBtn && rateRecipeModal) {
+    showRateRecipeModalBtn.addEventListener("click", () => {
+      console.log("Opening rate recipe modal")
+      // Set a default recipe name for demo purposes
+      const recipeNameElement = document.getElementById("rate-recipe-name")
+      if (recipeNameElement) {
+        recipeNameElement.textContent = "Sample Recipe"
+      }
+      rateRecipeModal.classList.remove("hidden")
+    })
   }
 
-  if (mobileSubmitRecipeBtn && submitRecipeModal) {
-    mobileSubmitRecipeBtn.addEventListener("click", (e) => {
+  // Share recipe modal button
+  if (showShareRecipeModalBtn && shareRecipeModal) {
+    showShareRecipeModalBtn.addEventListener("click", () => {
+      console.log("Opening share recipe modal")
+      // Set a default recipe name for demo purposes
+      const recipeNameElement = document.getElementById("share-recipe-name")
+      if (recipeNameElement) {
+        recipeNameElement.textContent = "Sample Recipe"
+      }
+      // Set a default share link
+      const shareLinkInput = document.getElementById("share-link")
+      if (shareLinkInput) {
+        shareLinkInput.value = window.location.href
+      }
+      shareRecipeModal.classList.remove("hidden")
+    })
+  }
+
+  // Toggle dark mode button
+  if (toggleDarkModeBtn) {
+    toggleDarkModeBtn.addEventListener("click", () => {
+      console.log("Toggling dark mode")
+      DarkMode.toggleTheme()
+    })
+  }
+
+  // User account button in nav
+  const userAccountBtn = document.getElementById("user-account-btn")
+  if (userAccountBtn && loginModal) {
+    userAccountBtn.addEventListener("click", (e) => {
       e.preventDefault()
-      submitRecipeModal.classList.remove("hidden")
+      console.log("Opening account modal from nav")
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Mobile user account button
+  const mobileUserAccountBtn = document.getElementById("mobile-user-account-btn")
+  if (mobileUserAccountBtn && loginModal) {
+    mobileUserAccountBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      console.log("Opening account modal from mobile nav")
+      loginModal.classList.remove("hidden")
+    })
+  }
+
+  // Close buttons for all modals
+  const closeButtons = document.querySelectorAll('[id$="-modal-btn"]')
+  closeButtons.forEach((button) => {
+    if (button.id.startsWith("close-")) {
+      const modalId = button.id.replace("close-", "")
+      const modal = document.getElementById(modalId)
+      if (modal) {
+        button.addEventListener("click", () => {
+          console.log(`Closing ${modalId}`)
+          modal.classList.add("hidden")
+        })
+      }
+    }
+  })
+
+  // Switch between login and signup
+  const showSignupBtn = document.getElementById("show-signup-btn")
+  const showLoginBtn = document.getElementById("show-login-btn")
+  const signupModal = document.getElementById("signup-modal")
+
+  if (showSignupBtn && loginModal && signupModal) {
+    showSignupBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      loginModal.classList.add("hidden")
+      signupModal.classList.remove("hidden")
+    })
+  }
+
+  if (showLoginBtn && loginModal && signupModal) {
+    showLoginBtn.addEventListener("click", (e) => {
+      e.preventDefault()
+      signupModal.classList.add("hidden")
+      loginModal.classList.remove("hidden")
     })
   }
 }
 
 // Replace the existing DOMContentLoaded event listener with this one
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM fully loaded")
+
   // Initialize existing features
   App.init()
 
