@@ -35,6 +35,7 @@ const ModalManager = {
         { triggerId: "mobile-user-account-btn", modalId: "login-modal" },
         { triggerId: "show-shopping-list-modal-btn", modalId: "shopping-list-modal" },
         { triggerId: "show-submit-recipe-modal-btn", modalId: "submit-recipe-modal" },
+        { triggerId: "show-submit-recipe-modal-btn-footer", modalId: "submit-recipe-modal" },
         { triggerId: "show-rate-recipe-modal-btn", modalId: "rate-recipe-modal" },
         { triggerId: "show-share-recipe-modal-btn", modalId: "share-recipe-modal" },
         { triggerId: "show-meal-planner-btn", modalId: "add-meal-plan-modal" },
@@ -64,7 +65,10 @@ const ModalManager = {
         }
   
         // Submit recipe modal button
-        if (e.target.matches("#show-submit-recipe-modal-btn") || e.target.closest("#show-submit-recipe-modal-btn")) {
+        if (
+          e.target.matches("#show-submit-recipe-modal-btn, #show-submit-recipe-modal-btn-footer") ||
+          e.target.closest("#show-submit-recipe-modal-btn, #show-submit-recipe-modal-btn-footer")
+        ) {
           e.preventDefault()
           this.openModal("submit-recipe-modal")
         }
