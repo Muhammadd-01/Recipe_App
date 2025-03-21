@@ -60,6 +60,9 @@ const DarkMode = {
 
     // Debug log
     console.log("DarkMode initialized, current state:", this.isDarkMode())
+
+    // Make DarkMode globally available
+    window.DarkMode = this
   },
 
   /**
@@ -191,6 +194,9 @@ const DarkMode = {
     return document.documentElement.classList.contains("dark") || document.body.classList.contains("dark")
   },
 }
+
+// Initialize DarkMode immediately to prevent flash of incorrect theme
+DarkMode.init()
 
 export default DarkMode
 

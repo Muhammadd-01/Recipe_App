@@ -1,51 +1,53 @@
-import Favorites from "./favorites.js"
-
 /**
- * UI functions for rendering and managing the recipe app interface
+ * UI Controller
  */
 const UI = {
-  elements: {
-    views: {
-      home: document.getElementById("home-view"),
-      favorites: document.getElementById("favorites-view"),
-      recipeDetails: document.getElementById("recipe-details-view"),
-    },
-    recipesContainer: document.getElementById("recipes-container"),
-    favoritesContainer: document.getElementById("favorites-container"),
-    recipeDetailsContainer: document.getElementById("recipe-details-container"),
-    loadingSpinner: document.getElementById("loading-spinner"),
-    searchInput: document.getElementById("search-input"),
-    mobileSearchInput: document.getElementById("mobile-search-input"),
-    categoryButtons: document.getElementById("category-buttons"),
-    backButton: document.getElementById("back-button"),
-    noFavorites: document.getElementById("no-favorites"),
-    navLinks: document.querySelectorAll(".nav-link[data-view]"),
-    mobileNavLinks: document.querySelectorAll(".mobile-nav-link[data-view]"),
-  },
+  /**
+   * Initialize UI
+   */
+  init() {
+    // Set up view navigation
+    this.setupViewNavigation()
 
-  templates: {
-    recipeCard: document.getElementById("recipe-card-template"),
+    // Set up back button
+    this.setupBackButton()
+
+    // Set up modal triggers
+    this.setupModalTriggers()
+
+    // Initialize tooltips
+    this.initTooltips()
+
+    console.log("UI initialized")
   },
 
   /**
-   * Initialize UI event listeners
+   * Set up view navigation
    */
-  init() {
-    // Navigation
-    this.elements.navLinks.forEach((link) => {
+  setupViewNavigation() {
+    // Get all nav links with data-view attribute
+    const navLinks = document.querySelectorAll(".nav-link[data-view], .mobile-nav-link[data-view]")
+
+    // Add click event listener to each nav link
+    navLinks.forEach((link) => {
       link.addEventListener("click", (e) => {
         e.preventDefault()
+
+        // Get view name from data-view attribute
         const viewName = link.getAttribute("data-view")
+
+        // Show view
         this.showView(viewName)
 
         // Update active nav link
-        this.elements.navLinks.forEach((l) => l.classList.remove("active"))
-        link.classList.add("active")
+        this.updateActiveNavLink(viewName)
 
         // Close mobile menu if open
         const mobileMenu = document.getElementById("mobile-menu")
         if (mobileMenu && !mobileMenu.classList.contains("hidden")) {
           mobileMenu.classList.add("hidden")
+
+          // Update mobile menu button icon
           const mobileMenuButton = document.getElementById("mobile-menu-button")
           if (mobileMenuButton) {
             mobileMenuButton.innerHTML = '<i class="fas fa-bars text-2xl"></i>'
@@ -53,90 +55,206 @@ const UI = {
         }
       })
     })
+  },
 
-    // Mobile Navigation
-    this.elements.mobileNavLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault()
-        const viewName = link.getAttribute("data-view")
-        this.showView(viewName)
-
-        // Update active nav link
-        this.elements.mobileNavLinks.forEach((l) => l.classList.remove("active"))
-        link.classList.add("active")
-
-        // Also update desktop nav
-        this.elements.navLinks.forEach((l) => {
-          if (l.getAttribute("data-view") === viewName) {
-            l.classList.add("active")
-          } else {
-            l.classList.remove("active")
-          }
-        })
-
-        // Close mobile menu
-        const mobileMenu = document.getElementById("mobile-menu")
-        if (mobileMenu) {
-          mobileMenu.classList.add("hidden")
-          const mobileMenuButton = document.getElementById("mobile-menu-button")
-          if (mobileMenuButton) {
-            mobileMenuButton.innerHTML = '<i class="fas fa-bars text-2xl"></i>'
-          }
-        }
-      })
-    })
-
-    // Back button
-    if (this.elements.backButton) {
-      this.elements.backButton.addEventListener("click", () => {
+  /**
+   * Set up back button
+   */
+  setupBackButton() {
+    const backButton = document.getElementById("back-button")
+    if (backButton) {
+      backButton.addEventListener("click", () => {
+        // Show home view
         this.showView("home")
 
         // Update active nav link
-        this.elements.navLinks.forEach((link) => {
-          if (link.getAttribute("data-view") === "home") {
-            link.classList.add("active")
-          } else {
-            link.classList.remove("active")
-          }
-        })
-
-        // Also update mobile nav
-        this.elements.mobileNavLinks.forEach((link) => {
-          if (link.getAttribute("data-view") === "home") {
-            link.classList.add("active")
-          } else {
-            link.classList.remove("active")
-          }
-        })
+        this.updateActiveNavLink("home")
       })
     }
   },
 
   /**
-   * Show a specific view and hide others
-   * @param {string} viewName - Name of the view to show
+   * Set up modal triggers
    */
-  showView(viewName) {
-    Object.keys(this.elements.views).forEach((key) => {
-      if (this.elements.views[key]) {
-        this.elements.views[key].classList.remove("active")
+  setupModalTriggers() {
+    console.log("Setting up modal triggers")
+
+    // Account modal
+    this.setupModalTrigger("user-account-btn", "login-modal")
+    this.setupModalTrigger("mobile-user-account-btn", "login-modal")
+    this.setupModalTrigger("show-account-modal-btn", "login-modal")
+
+    // Shopping list modal
+    this.setupModalTrigger("show-shopping-list-modal-btn", "shopping-list-modal")
+
+    // Recipe submission modal
+    this.setupModalTrigger("show-submit-recipe-modal-btn", "submit-recipe-modal")
+
+    // Recipe rating modal
+    this.setupModalTrigger("show-rate-recipe-modal-btn", "rate-recipe-modal", () => {
+      // Set a default recipe name for demo purposes
+      const recipeNameElement = document.getElementById("rate-recipe-name")
+      if (recipeNameElement) {
+        recipeNameElement.textContent = "Sample Recipe"
       }
     })
 
-    if (this.elements.views[viewName]) {
-      this.elements.views[viewName].classList.add("active")
+    // Recipe sharing modal
+    this.setupModalTrigger("show-share-recipe-modal-btn", "share-recipe-modal", () => {
+      // Set a default recipe name for demo purposes
+      const recipeNameElement = document.getElementById("share-recipe-name")
+      if (recipeNameElement) {
+        recipeNameElement.textContent = "Sample Recipe"
+      }
+
+      // Set a default share link
+      const shareLinkInput = document.getElementById("share-link")
+      if (shareLinkInput) {
+        shareLinkInput.value = window.location.href
+      }
+    })
+
+    // Toggle dark mode button
+    const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
+    if (toggleDarkModeBtn) {
+      toggleDarkModeBtn.addEventListener("click", () => {
+        console.log("Toggle dark mode button clicked")
+        if (window.DarkMode) {
+          window.DarkMode.toggleTheme()
+        }
+      })
     }
+
+    // Close buttons for all modals
+    const closeButtons = document.querySelectorAll("[id^='close-'][id$='-modal-btn']")
+    closeButtons.forEach((button) => {
+      const modalId = button.id.replace("close-", "").replace("-btn", "")
+      const modal = document.getElementById(modalId)
+
+      if (button && modal) {
+        button.addEventListener("click", () => {
+          console.log(`Closing ${modalId}`)
+          modal.classList.add("hidden")
+        })
+      }
+    })
+
+    // Switch between login and signup
+    this.setupModalSwitch("show-signup-btn", "login-modal", "signup-modal")
+    this.setupModalSwitch("show-login-btn", "signup-modal", "login-modal")
+  },
+
+  /**
+   * Set up modal trigger
+   * @param {string} triggerId - ID of the trigger element
+   * @param {string} modalId - ID of the modal element
+   * @param {Function} callback - Optional callback function to run when modal is opened
+   */
+  setupModalTrigger(triggerId, modalId, callback) {
+    const trigger = document.getElementById(triggerId)
+    const modal = document.getElementById(modalId)
+
+    if (trigger && modal) {
+      console.log(`Setting up modal trigger: ${triggerId} -> ${modalId}`)
+
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault()
+        console.log(`Opening modal: ${modalId}`)
+        modal.classList.remove("hidden")
+
+        if (callback && typeof callback === "function") {
+          callback()
+        }
+      })
+    } else {
+      console.warn(`Modal trigger setup failed: ${triggerId} -> ${modalId}`)
+      if (!trigger) console.warn(`Trigger element not found: ${triggerId}`)
+      if (!modal) console.warn(`Modal element not found: ${modalId}`)
+    }
+  },
+
+  /**
+   * Set up modal switch
+   * @param {string} triggerId - ID of the trigger element
+   * @param {string} fromModalId - ID of the modal to hide
+   * @param {string} toModalId - ID of the modal to show
+   */
+  setupModalSwitch(triggerId, fromModalId, toModalId) {
+    const trigger = document.getElementById(triggerId)
+    const fromModal = document.getElementById(fromModalId)
+    const toModal = document.getElementById(toModalId)
+
+    if (trigger && fromModal && toModal) {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault()
+        fromModal.classList.add("hidden")
+        toModal.classList.remove("hidden")
+      })
+    }
+  },
+
+  /**
+   * Initialize tooltips
+   */
+  initTooltips() {
+    // Add tooltip functionality if needed
+  },
+
+  /**
+   * Show view by name
+   * @param {string} viewName - Name of the view to show
+   */
+  showView(viewName) {
+    // Get all views
+    const views = document.querySelectorAll(".app-view")
+
+    // Hide all views
+    views.forEach((view) => {
+      view.classList.remove("active")
+    })
+
+    // Show selected view
+    const selectedView = document.getElementById(`${viewName}-view`)
+    if (selectedView) {
+      selectedView.classList.add("active")
+    }
+  },
+
+  /**
+   * Update active nav link
+   * @param {string} viewName - Name of the active view
+   */
+  updateActiveNavLink(viewName) {
+    // Get all nav links
+    const navLinks = document.querySelectorAll(".nav-link, .mobile-nav-link")
+
+    // Remove active class from all nav links
+    navLinks.forEach((link) => {
+      link.classList.remove("active")
+    })
+
+    // Add active class to selected nav link
+    const selectedNavLinks = document.querySelectorAll(
+      `.nav-link[data-view="${viewName}"], .mobile-nav-link[data-view="${viewName}"]`,
+    )
+    selectedNavLinks.forEach((link) => {
+      link.classList.add("active")
+    })
   },
 
   /**
    * Show loading spinner
    */
   showLoading() {
-    if (this.elements.loadingSpinner) {
-      this.elements.loadingSpinner.style.display = "flex"
+    const loadingSpinner = document.getElementById("loading-spinner")
+    const recipesContainer = document.getElementById("recipes-container")
+
+    if (loadingSpinner) {
+      loadingSpinner.classList.remove("hidden")
     }
-    if (this.elements.recipesContainer) {
-      this.elements.recipesContainer.style.display = "none"
+
+    if (recipesContainer) {
+      recipesContainer.classList.add("hidden")
     }
   },
 
@@ -144,140 +262,174 @@ const UI = {
    * Hide loading spinner
    */
   hideLoading() {
-    if (this.elements.loadingSpinner) {
-      this.elements.loadingSpinner.style.display = "none"
+    const loadingSpinner = document.getElementById("loading-spinner")
+    const recipesContainer = document.getElementById("recipes-container")
+
+    if (loadingSpinner) {
+      loadingSpinner.classList.add("hidden")
     }
-    if (this.elements.recipesContainer) {
-      this.elements.recipesContainer.style.display = "grid"
+
+    if (recipesContainer) {
+      recipesContainer.classList.remove("hidden")
     }
   },
 
   /**
-   * Render recipes to the recipes container
+   * Render recipes
    * @param {Array} recipes - Array of recipe objects
    */
   renderRecipes(recipes) {
-    if (!this.elements.recipesContainer) return
+    const recipesContainer = document.getElementById("recipes-container")
 
-    this.elements.recipesContainer.innerHTML = ""
+    if (recipesContainer) {
+      // Clear container
+      recipesContainer.innerHTML = ""
 
-    if (recipes.length === 0) {
-      this.elements.recipesContainer.innerHTML = `
-                <div class="col-span-full text-center py-16 text-light-textLight dark:text-dark-textLight">
-                    <i class="fas fa-search text-5xl mb-4"></i>
-                    <p class="text-lg">No recipes found.</p>
-                    <p class="mb-6">Try a different search or category.</p>
-                </div>
-            `
-      return
+      if (recipes.length === 0) {
+        // Show no results message
+        recipesContainer.innerHTML = `
+          <div class="col-span-full text-center py-16 text-light-textLight dark:text-dark-textLight">
+            <i class="fas fa-search text-5xl mb-4"></i>
+            <p class="text-lg">No recipes found</p>
+            <p class="mb-4">Try different search terms or filters</p>
+          </div>
+        `
+        return
+      }
+
+      // Create and append recipe cards
+      recipes.forEach((recipe) => {
+        const recipeCard = this.createRecipeCard(recipe)
+        recipesContainer.appendChild(recipeCard)
+      })
     }
-
-    recipes.forEach((recipe) => {
-      const recipeCard = this.createRecipeCard(recipe)
-      this.elements.recipesContainer.appendChild(recipeCard)
-    })
   },
 
   /**
-   * Append recipes to the existing recipes in the container
+   * Append recipes to existing recipes
    * @param {Array} recipes - Array of recipe objects
    */
   appendRecipes(recipes) {
-    if (!this.elements.recipesContainer) return
+    const recipesContainer = document.getElementById("recipes-container")
 
-    if (recipes.length === 0) return
-
-    recipes.forEach((recipe) => {
-      const recipeCard = this.createRecipeCard(recipe)
-      this.elements.recipesContainer.appendChild(recipeCard)
-    })
-  },
-
-  /**
-   * Render favorite recipes
-   * @param {Array} favorites - Array of favorite recipe objects
-   */
-  renderFavorites(favorites) {
-    if (!this.elements.favoritesContainer || !this.elements.noFavorites) return
-
-    this.elements.favoritesContainer.innerHTML = ""
-
-    if (favorites.length === 0) {
-      this.elements.noFavorites.style.display = "block"
-      return
+    if (recipesContainer && recipes.length > 0) {
+      // Create and append recipe cards
+      recipes.forEach((recipe) => {
+        const recipeCard = this.createRecipeCard(recipe)
+        recipesContainer.appendChild(recipeCard)
+      })
     }
-
-    this.elements.noFavorites.style.display = "none"
-
-    favorites.forEach((recipe) => {
-      const recipeCard = this.createRecipeCard(recipe)
-      this.elements.favoritesContainer.appendChild(recipeCard)
-    })
   },
 
   /**
-   * Create a recipe card element
+   * Create recipe card
    * @param {Object} recipe - Recipe object
    * @returns {HTMLElement} - Recipe card element
    */
   createRecipeCard(recipe) {
-    if (!this.templates.recipeCard) return document.createElement("div")
+    // Get recipe card template
+    const template = document.getElementById("recipe-card-template")
 
-    const template = this.templates.recipeCard.content.cloneNode(true)
+    if (template) {
+      // Clone template content
+      const recipeCard = template.content.cloneNode(true)
 
-    // Set recipe image
-    const img = template.querySelector(".recipe-image img")
-    img.src = recipe.thumbnail
-    img.alt = recipe.name
+      // Set recipe image
+      const img = recipeCard.querySelector("img")
+      img.src = recipe.thumbnail || "/placeholder.svg?height=300&width=300"
+      img.alt = recipe.name
 
-    // Set favorite button
-    const favoriteBtn = template.querySelector(".favorite-btn")
-    if (Favorites.isFavorite(recipe.id)) {
-      favoriteBtn.classList.add("active")
-      favoriteBtn.textContent = "♥"
+      // Set favorite button
+      const favoriteBtn = recipeCard.querySelector(".favorite-btn")
+      if (window.Favorites && window.Favorites.isFavorite(recipe.id)) {
+        favoriteBtn.classList.add("active")
+        favoriteBtn.textContent = "♥"
+      }
+
+      favoriteBtn.addEventListener("click", (e) => {
+        e.stopPropagation()
+        this.toggleFavorite(favoriteBtn, recipe)
+      })
+
+      // Set recipe title
+      recipeCard.querySelector(".recipe-title").textContent = recipe.name
+
+      // Set recipe category
+      recipeCard.querySelector(".category-tag").textContent = recipe.category
+
+      // Set recipe rating
+      recipeCard.querySelector(".recipe-rating").textContent = `★ ${recipe.rating || "0.0"}`
+
+      // Set recipe time
+      recipeCard.querySelector(".time-text").textContent = `${recipe.cookingTime || "30"} mins`
+
+      // Set view recipe button
+      const viewRecipeBtn = recipeCard.querySelector(".view-recipe-btn")
+      viewRecipeBtn.addEventListener("click", () => {
+        this.showRecipeDetails(recipe)
+      })
+
+      return recipeCard
     }
 
-    favoriteBtn.addEventListener("click", (e) => {
-      e.stopPropagation()
-      this.toggleFavorite(favoriteBtn, recipe)
-    })
+    return document.createElement("div")
+  },
 
-    // Set recipe title
-    template.querySelector(".recipe-title").textContent = recipe.name
-
-    // Set recipe category
-    template.querySelector(".category-tag").textContent = recipe.category
-
-    // Set recipe rating
-    template.querySelector(".recipe-rating").textContent = `★ ${recipe.rating}`
-
-    // Set recipe time
-    template.querySelector(".time-text").textContent = `${recipe.cookingTime} mins`
-
-    // Set view recipe button
-    const viewRecipeBtn = template.querySelector(".view-recipe-btn")
-    viewRecipeBtn.addEventListener("click", (e) => {
-      e.stopPropagation()
-      this.showRecipeDetails(recipe)
-
-      // Load similar recipes if App is available
-      if (window.App && typeof window.App.loadSimilarRecipes === "function") {
-        window.App.loadSimilarRecipes(recipe)
+  /**
+   * Toggle favorite status
+   * @param {HTMLElement} favoriteBtn - Favorite button element
+   * @param {Object} recipe - Recipe object
+   */
+  toggleFavorite(favoriteBtn, recipe) {
+    if (window.Favorites) {
+      if (window.Favorites.isFavorite(recipe.id)) {
+        // Remove from favorites
+        window.Favorites.removeFavorite(recipe.id)
+        favoriteBtn.classList.remove("active")
+        favoriteBtn.textContent = "♡"
+      } else {
+        // Add to favorites
+        window.Favorites.addFavorite(recipe)
+        favoriteBtn.classList.add("active")
+        favoriteBtn.textContent = "♥"
       }
-    })
 
-    // Make the whole card clickable
-    const card = template.querySelector(".recipe-card")
-    card.addEventListener("click", () => {
-      this.showRecipeDetails(recipe)
-
-      // Load similar recipes if App is available
-      if (window.App && typeof window.App.loadSimilarRecipes === "function") {
-        window.App.loadSimilarRecipes(recipe)
+      // Update favorites view if it's active
+      const favoritesView = document.getElementById("favorites-view")
+      if (favoritesView && favoritesView.classList.contains("active")) {
+        this.renderFavorites(window.Favorites.getFavorites())
       }
-    })
+    }
+  },
 
-    return template
+  /**
+   * Render favorites
+   * @param {Array} favorites - Array of favorite recipe objects
+   */
+  renderFavorites(favorites) {
+    const favoritesContainer = document.getElementById("favorites-container")
+    const noFavorites = document.getElementById("no-favorites")
+
+    if (favoritesContainer && noFavorites) {
+      // Clear container
+      favoritesContainer.innerHTML = ""
+
+      if (favorites.length === 0) {
+        // Show no favorites message
+        favoritesContainer.classList.add("hidden")
+        noFavorites.classList.remove("hidden")
+      } else {
+        // Hide no favorites message
+        favoritesContainer.classList.remove("hidden")
+        noFavorites.classList.add("hidden")
+
+        // Create and append recipe cards
+        favorites.forEach((recipe) => {
+          const recipeCard = this.createRecipeCard(recipe)
+          favoritesContainer.appendChild(recipeCard)
+        })
+      }
+    }
   },
 
   /**
@@ -285,368 +437,223 @@ const UI = {
    * @param {Object} recipe - Recipe object
    */
   showRecipeDetails(recipe) {
-    if (!this.elements.recipeDetailsContainer) return
+    const recipeDetailsContainer = document.getElementById("recipe-details-container")
 
-    this.elements.recipeDetailsContainer.innerHTML = `
+    if (recipeDetailsContainer) {
+      // Show recipe details view
+      this.showView("recipe-details")
+
+      // Create recipe details HTML
+      const recipeDetailsHTML = `
         <div class="relative">
-            <div class="h-64 md:h-96 overflow-hidden">
-                <img src="${recipe.thumbnail}" alt="${recipe.name}" class="w-full h-full object-cover">
-            </div>
-            <button class="favorite-btn absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center text-2xl ${Favorites.isFavorite(recipe.id) ? "active" : ""}">${Favorites.isFavorite(recipe.id) ? "♥" : "♡"}</button>
-            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black to-transparent p-6">
-                <div class="text-white">
-                    <span class="bg-primary text-white text-sm font-medium py-1 px-2 rounded-sm">${recipe.category}</span>
-                    <h2 class="font-heading text-2xl md:text-3xl font-bold mt-2">${recipe.name}</h2>
-                </div>
-            </div>
+          <img src="${recipe.thumbnail || "/placeholder.svg?height=500&width=1000"}" alt="${recipe.name}" class="w-full h-64 md:h-96 object-cover">
+          <button class="favorite-btn absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">
+            ${window.Favorites && window.Favorites.isFavorite(recipe.id) ? "♥" : "♡"}
+          </button>
         </div>
         <div class="p-6 md:p-8">
-            <div class="flex flex-wrap gap-4 mb-6 text-light-textLight dark:text-dark-textLight">
-                <div class="flex items-center">
-                    <i class="fas fa-globe-americas mr-2 text-primary"></i>
-                    <span>${recipe.area || "International"}</span>
-                </div>
-                <div class="flex items-center">
-                    <i class="fas fa-star mr-2 text-highlight"></i>
-                    <span>${recipe.rating} Rating</span>
-                </div>
-                <div class="flex items-center">
-                    <i class="far fa-clock mr-2 text-primary"></i>
-                    <span>${recipe.cookingTime} mins</span>
-                </div>
-                <div class="flex items-center">
-                    <i class="fas fa-utensils mr-2 text-primary"></i>
-                    <span>${recipe.ingredients.length} Ingredients</span>
-                </div>
+          <div class="mb-2">
+            <span class="bg-primary text-white text-sm py-1 px-2 rounded-sm">${recipe.category}</span>
+            ${recipe.area ? `<span class="bg-secondary text-white text-sm py-1 px-2 rounded-sm ml-2">${recipe.area}</span>` : ""}
+          </div>
+          <h2 class="font-heading text-2xl md:text-3xl font-bold mb-4 dark:text-dark-text">${recipe.name}</h2>
+          
+          <div class="flex flex-wrap items-center mb-6 text-light-textLight dark:text-dark-textLight">
+            <div class="flex items-center mr-6 mb-2">
+              <i class="fas fa-star text-highlight mr-2"></i>
+              <span>${recipe.rating || "0.0"} Rating</span>
             </div>
-              Ingredients</span>
-                </div>
+            <div class="flex items-center mr-6 mb-2">
+              <i class="far fa-clock mr-2"></i>
+              <span>${recipe.cookingTime || "30"} mins</span>
             </div>
-            
-            <div class="flex flex-wrap gap-4 mb-8">
-                <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                    <i class="fas fa-print mr-2"></i> Print Recipe
-                </button>
-                <button class="share-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                    <i class="fas fa-share-alt mr-2"></i> Share Recipe
-                </button>
-                <button class="find-restaurants-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-dish-name="${recipe.name}">
-                    <i class="fas fa-utensils mr-2"></i> Find Restaurants
-                </button>
-                <button class="add-to-plan-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
-                    <i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan
-                </button>
-                <button class="add-to-shopping-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}">
-                    <i class="fas fa-shopping-basket mr-2"></i> Add to Shopping List
-                </button>
-                <button class="rate-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}">
-                    <i class="fas fa-star mr-2"></i> Rate Recipe
-                </button>
+            <div class="flex items-center mb-2">
+              <i class="fas fa-utensils mr-2"></i>
+              <span>${recipe.area || "International"} Cuisine</span>
             </div>
-            
-            <div class="mb-8">
-                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Ingredients</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    ${recipe.ingredients
-                      .map(
-                        (ingredient) => `
-                        <div class="flex items-center p-3 bg-light-bg dark:bg-dark-bg rounded-md hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
-                            <i class="fas fa-check-circle text-secondary mr-3"></i>
-                            <span class="dark:text-dark-text">${ingredient.measure} ${ingredient.name}</span>
-                            <button class="add-ingredient-to-shopping-btn ml-auto text-primary hover:text-opacity-80 transition duration-300" 
-                                data-name="${ingredient.name}" 
-                                data-amount="${ingredient.measure}" 
-                                data-category="Ingredients">
-                                <i class="fas fa-plus-circle"></i>
-                            </button>
-                        </div>
-                    `,
-                      )
-                      .join("")}
-                </div>
+          </div>
+          
+          <div class="mb-8">
+            <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Ingredients</h3>
+            <ul class="space-y-2 mb-6">
+              ${recipe.ingredients
+                .map(
+                  (ingredient) => `
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                  <span class="dark:text-dark-text">${ingredient.amount ? ingredient.amount + " " : ""}${ingredient.name}</span>
+                  <button class="add-to-shopping-list-btn ml-auto text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-ingredient='${JSON.stringify({ id: `${recipe.id}-${ingredient.name.replace(/\s+/g, "-")}`, name: ingredient.name, amount: ingredient.amount, category: recipe.category })}'>
+                    <i class="fas fa-plus-circle"></i>
+                  </button>
+                </li>
+              `,
+                )
+                .join("")}
+            </ul>
+          </div>
+          
+          <div class="mb-8">
+            <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Instructions</h3>
+            <div class="prose prose-lg max-w-none dark:prose-invert dark:text-dark-text">
+              ${recipe.instructions
+                .split("\n")
+                .map((paragraph) => `<p>${paragraph}</p>`)
+                .join("")}
             </div>
-            
-            <div class="mb-8">
-                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Instructions</h3>
-                ${this.formatInstructions(recipe.instructions)}
+          </div>
+          
+          <div class="flex flex-wrap gap-4">
+            <button class="rate-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}">
+              <i class="fas fa-star mr-2"></i> Rate Recipe
+            </button>
+            <button class="add-to-plan-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
+              <i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan
+            </button>
+            <button class="share-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
+              <i class="fas fa-share-alt mr-2"></i> Share Recipe
+            </button>
+            <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+              <i class="fas fa-print mr-2"></i> Print Recipe
+            </button>
+          </div>
+          
+          ${
+            recipe.youtube
+              ? `
+            <div class="mt-8">
+              <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Video Tutorial</h3>
+              <div class="aspect-w-16 aspect-h-9">
+                <iframe src="${recipe.youtube.replace("watch?v=", "embed/")}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="rounded-lg"></iframe>
+              </div>
             </div>
-            
-            ${
-              recipe.youtube
-                ? `
-            <div class="mb-8">
-                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Video Tutorial</h3>
-                <a href="${recipe.youtube}" target="_blank" class="inline-flex items-center bg-red-600 text-white font-medium py-2 px-4 rounded-md hover:bg-red-700 transition duration-300">
-                    <i class="fab fa-youtube mr-2"></i> Watch on YouTube
-                </a>
+          `
+              : ""
+          }
+          
+          ${
+            recipe.source
+              ? `
+            <div class="mt-8 text-light-textLight dark:text-dark-textLight">
+              <p>Source: <a href="${recipe.source}" target="_blank" class="text-primary hover:underline">${recipe.source}</a></p>
             </div>
-            `
-                : ""
-            }
-            
-            <!-- User Reviews Section -->
-            <div class="mb-8">
-                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">User Reviews</h3>
-                <div id="reviews-container" class="space-y-4">
-                    <!-- Reviews will be loaded here -->
-                    <div class="text-center py-4 text-light-textLight dark:text-dark-textLight">
-                        <p>No reviews yet. Be the first to rate this recipe!</p>
-                    </div>
-                </div>
-            </div>
-            
-            ${
-              recipe.source
-                ? `
-            <div class="pt-6 border-t border-light-border dark:border-dark-border">
-                <p class="text-light-textLight dark:text-dark-textLight">
-                    Source: <a href="${recipe.source}" target="_blank" class="text-primary hover:underline">Original Recipe</a>
-                </p>
-            </div>
-            `
-                : ""
-            }
+          `
+              : ""
+          }
         </div>
-    `
+      `
 
-    // Add favorite toggle event listener
-    const favoriteBtn = this.elements.recipeDetailsContainer.querySelector(".favorite-btn")
-    favoriteBtn.addEventListener("click", () => {
-      this.toggleFavorite(favoriteBtn, recipe)
-    })
+      // Set recipe details HTML
+      recipeDetailsContainer.innerHTML = recipeDetailsHTML
 
-    // Add print recipe event listener
-    const printBtn = this.elements.recipeDetailsContainer.querySelector(".print-recipe-btn")
-    printBtn.addEventListener("click", () => {
-      this.printRecipe(recipe)
-    })
+      // Add event listeners to buttons
 
-    // Add share recipe event listener
-    const shareBtn = this.elements.recipeDetailsContainer.querySelector(".share-recipe-btn")
-    shareBtn.addEventListener("click", () => {
-      if (window.openSharingModal) {
-        window.openSharingModal(recipe.id, recipe.name, recipe.thumbnail)
-      } else {
-        this.shareRecipe(recipe)
-      }
-    })
-
-    // Add find restaurants event listener
-    const findRestaurantsBtn = this.elements.recipeDetailsContainer.querySelector(".find-restaurants-btn")
-    findRestaurantsBtn.addEventListener("click", () => {
-      if (window.RestaurantFinder) {
-        window.RestaurantFinder.showRestaurantFinderModal(recipe.name)
-      }
-    })
-
-    // Add to meal plan event listener
-    const addToPlanBtn = this.elements.recipeDetailsContainer.querySelector(".add-to-plan-btn")
-    addToPlanBtn.addEventListener("click", () => {
-      if (window.MealPlanner) {
-        window.MealPlanner.showAddToPlanModal(recipe.id, recipe.name, recipe.thumbnail)
-      }
-    })
-
-    // Add to shopping list event listener
-    const addToShoppingBtn = this.elements.recipeDetailsContainer.querySelector(".add-to-shopping-btn")
-    addToShoppingBtn.addEventListener("click", () => {
-      this.addRecipeToShoppingList(recipe)
-    })
-
-    // Add individual ingredients to shopping list
-    const addIngredientBtns = this.elements.recipeDetailsContainer.querySelectorAll(".add-ingredient-to-shopping-btn")
-    addIngredientBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation()
-        const name = btn.getAttribute("data-name")
-        const amount = btn.getAttribute("data-amount")
-        const category = btn.getAttribute("data-category")
-
-        this.addIngredientToShoppingList(name, amount, category)
-
-        // Show feedback
-        const originalIcon = btn.innerHTML
-        btn.innerHTML = '<i class="fas fa-check"></i>'
-
-        setTimeout(() => {
-          btn.innerHTML = originalIcon
-        }, 1500)
-      })
-    })
-
-    // Rate recipe event listener
-    const rateRecipeBtn = this.elements.recipeDetailsContainer.querySelector(".rate-recipe-btn")
-    rateRecipeBtn.addEventListener("click", () => {
-      if (window.openRatingModal) {
-        window.openRatingModal(recipe.id, recipe.name)
-      }
-    })
-
-    // Load reviews
-    this.loadReviews(recipe.id)
-
-    this.showView("recipe-details")
-  },
-
-  /**
-   * Add a recipe's ingredients to the shopping list
-   * @param {Object} recipe - Recipe object
-   */
-  addRecipeToShoppingList(recipe) {
-    // Get current shopping list
-    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
-
-    // Add each ingredient
-    recipe.ingredients.forEach((ingredient) => {
-      // Check if ingredient is already in the list
-      const existingItem = shoppingList.find((item) => item.name.toLowerCase() === ingredient.name.toLowerCase())
-
-      if (!existingItem) {
-        shoppingList.push({
-          id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
-          name: ingredient.name,
-          amount: ingredient.measure,
-          category: "Ingredients",
-          checked: false,
+      // Favorite button
+      const favoriteBtn = recipeDetailsContainer.querySelector(".favorite-btn")
+      if (favoriteBtn) {
+        favoriteBtn.addEventListener("click", () => {
+          this.toggleFavorite(favoriteBtn, recipe)
         })
       }
-    })
 
-    // Save updated shopping list
-    localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
+      // Add to shopping list buttons
+      const addToShoppingListBtns = recipeDetailsContainer.querySelectorAll(".add-to-shopping-list-btn")
+      addToShoppingListBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const ingredient = JSON.parse(btn.getAttribute("data-ingredient"))
+          this.addToShoppingList(ingredient)
 
-    // Show confirmation
-    alert("Ingredients added to shopping list!")
-  },
+          // Show added animation
+          btn.innerHTML = '<i class="fas fa-check"></i>'
+          btn.classList.add("text-primary")
 
-  /**
-   * Add a single ingredient to the shopping list
-   * @param {string} name - Ingredient name
-   * @param {string} amount - Ingredient amount
-   * @param {string} category - Ingredient category
-   */
-  addIngredientToShoppingList(name, amount, category) {
-    // Get current shopping list
-    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
-
-    // Check if ingredient is already in the list
-    const existingItem = shoppingList.find((item) => item.name.toLowerCase() === name.toLowerCase())
-
-    if (!existingItem) {
-      shoppingList.push({
-        id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
-        name,
-        amount,
-        category,
-        checked: false,
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-plus-circle"></i>'
+            btn.classList.remove("text-primary")
+          }, 2000)
+        })
       })
 
-      // Save updated shopping list
+      // Rate recipe button
+      const rateRecipeBtn = recipeDetailsContainer.querySelector(".rate-recipe-btn")
+      if (rateRecipeBtn) {
+        rateRecipeBtn.addEventListener("click", () => {
+          const recipeId = rateRecipeBtn.getAttribute("data-recipe-id")
+          const recipeName = rateRecipeBtn.getAttribute("data-recipe-name")
+
+          if (window.openRatingModal) {
+            window.openRatingModal(recipeId, recipeName)
+          }
+        })
+      }
+
+      // Add to meal plan button
+      const addToPlanBtn = recipeDetailsContainer.querySelector(".add-to-plan-btn")
+      if (addToPlanBtn) {
+        addToPlanBtn.addEventListener("click", () => {
+          const recipeId = addToPlanBtn.getAttribute("data-recipe-id")
+          const recipeName = addToPlanBtn.getAttribute("data-recipe-name")
+          const recipeImage = addToPlanBtn.getAttribute("data-recipe-image")
+
+          if (window.MealPlanner) {
+            window.MealPlanner.addRecipeToMealPlan(recipeId, recipeName, recipeImage)
+
+            // Show added animation
+            addToPlanBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Added to Meal Plan'
+
+            setTimeout(() => {
+              addToPlanBtn.innerHTML = '<i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan'
+            }, 2000)
+          }
+        })
+      }
+
+      // Share recipe button
+      const shareRecipeBtn = recipeDetailsContainer.querySelector(".share-recipe-btn")
+      if (shareRecipeBtn) {
+        shareRecipeBtn.addEventListener("click", () => {
+          const recipeId = shareRecipeBtn.getAttribute("data-recipe-id")
+          const recipeName = shareRecipeBtn.getAttribute("data-recipe-name")
+          const recipeImage = shareRecipeBtn.getAttribute("data-recipe-image")
+
+          if (window.openSharingModal) {
+            window.openSharingModal(recipeId, recipeName, recipeImage)
+          }
+        })
+      }
+
+      // Print recipe button
+      const printRecipeBtn = recipeDetailsContainer.querySelector(".print-recipe-btn")
+      if (printRecipeBtn) {
+        printRecipeBtn.addEventListener("click", () => {
+          this.printRecipe(recipe)
+        })
+      }
+    }
+  },
+
+  /**
+   * Add ingredient to shopping list
+   * @param {Object} ingredient - Ingredient object
+   */
+  addToShoppingList(ingredient) {
+    // Get shopping list from localStorage
+    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
+
+    // Check if ingredient already exists in shopping list
+    const existingIndex = shoppingList.findIndex((item) => item.id === ingredient.id)
+
+    if (existingIndex === -1) {
+      // Add ingredient to shopping list
+      shoppingList.push(ingredient)
+
+      // Save shopping list to localStorage
       localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
-    }
-  },
 
-  /**
-   * Load reviews for a recipe
-   * @param {string} recipeId - Recipe ID
-   */
-  loadReviews(recipeId) {
-    const reviewsContainer = document.getElementById("reviews-container")
-    if (!reviewsContainer) return
-
-    // Get ratings from localStorage
-    const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
-
-    // Check if this recipe has any ratings
-    if (!ratings[recipeId]) {
-      return
-    }
-
-    // Display the review
-    const review = ratings[recipeId]
-    const date = new Date(review.date)
-
-    reviewsContainer.innerHTML = `
-        <div class="bg-light-bg dark:bg-dark-bg rounded-lg p-4">
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-highlight font-medium">
-                    ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}
-                    <span class="ml-2">${review.rating}.0</span>
-                </div>
-                <div class="text-sm text-light-textLight dark:text-dark-textLight">
-                    ${date.toLocaleDateString()}
-                </div>
-            </div>
-            ${
-              review.review
-                ? `
-                <p class="text-light-textLight dark:text-dark-textLight">${review.review}</p>
-            `
-                : ""
-            }
-        </div>
-    `
-  },
-
-  /**
-   * Format recipe instructions into steps
-   * @param {string} instructions - Recipe instructions text
-   * @returns {string} - Formatted HTML
-   */
-  formatInstructions(instructions) {
-    if (!instructions) return '<p class="text-light-textLight dark:text-dark-textLight">No instructions available.</p>'
-
-    // Split instructions by periods or by numbered steps
-    const steps = instructions
-      .split(/\.\s+/)
-      .filter((step) => step.trim().length > 0)
-      .map((step) => step.trim())
-
-    // Remove the last empty step if the instructions end with a period
-    if (steps[steps.length - 1] === "") {
-      steps.pop()
-    }
-
-    // If the last step doesn't end with a period, add one
-    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
-      steps[steps.length - 1] += "."
-    }
-
-    return steps
-      .map(
-        (step, index) => `
-            <div class="flex mb-4">
-                <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">
-                    ${index + 1}
-                </div>
-                <div class="flex-1 text-light-textLight dark:text-dark-textLight">
-                    ${step}
-                </div>
-            </div>
-        `,
-      )
-      .join("")
-  },
-
-  /**
-   * Toggle favorite status for a recipe
-   * @param {HTMLElement} button - Favorite button element
-   * @param {Object} recipe - Recipe object
-   */
-  toggleFavorite(button, recipe) {
-    if (Favorites.isFavorite(recipe.id)) {
-      Favorites.removeFavorite(recipe.id)
-      button.classList.remove("active")
-      button.textContent = "♡"
+      // Show success message
+      this.showToast("Added to shopping list")
     } else {
-      Favorites.addFavorite(recipe)
-      button.classList.add("active")
-      button.textContent = "♥"
-    }
-
-    // Update favorites view if it's currently visible
-    if (this.elements.views.favorites && this.elements.views.favorites.classList.contains("active")) {
-      this.renderFavorites(Favorites.getFavorites())
+      // Show already exists message
+      this.showToast("Already in shopping list")
     }
   },
 
@@ -655,645 +662,173 @@ const UI = {
    * @param {Object} recipe - Recipe object
    */
   printRecipe(recipe) {
+    // Create print window
     const printWindow = window.open("", "_blank")
 
-    printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Print Recipe - ${recipe.name}</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 20px;
-                    }
-                    h1 {
-                        font-size: 24px;
-                        margin-bottom: 10px;
-                    }
-                    .meta {
-                        display: flex;
-                        gap: 20px;
-                        margin-bottom: 20px;
-                        color: #666;
-                    }
-                    .ingredients {
-                        margin-bottom: 30px;
-                    }
-                    .ingredients h2, .instructions h2 {
-                        font-size: 18px;
-                        margin-bottom: 10px;
-                        border-bottom: 1px solid #eee;
-                        padding-bottom: 5px;
-                    }
-                    .ingredients ul {
-                        padding-left: 20px;
-                    }
-                    .ingredients li {
-                        margin-bottom: 5px;
-                    }
-                    .step {
-                        margin-bottom: 15px;
-                    }
-                    .step-number {
-                        font-weight: bold;
-                        margin-right: 10px;
-                    }
-                    .footer {
-                        margin-top: 30px;
-                        font-size: 12px;
-                        color: #666;
-                        text-align: center;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>${recipe.name}</h1>
-                <div class="meta">
-                    <div>Category: ${recipe.category}</div>
-                    <div>Cooking Time: ${recipe.cookingTime} mins</div>
-                    <div>Rating: ${recipe.rating}/5</div>
-                </div>
-                
-                <div class="ingredients">
-                    <h2>Ingredients</h2>
-                    <ul>
-                        ${recipe.ingredients
-                          .map(
-                            (ingredient) => `
-                            <li>${ingredient.measure} ${ingredient.name}</li>
-                        `,
-                          )
-                          .join("")}
-                    </ul>
-                </div>
-                
-                <div class="instructions">
-                    <h2>Instructions</h2>
-                    ${this.formatPrintInstructions(recipe.instructions)}
-                </div>
-                
-                <div class="footer">
-                    <p>Recipe from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <script>
-                    window.onload = function() {
-                        window.print();
-                    }
-                </script>
-            </body>
-            </html>
-        `)
-
-    printWindow.document.close()
-  },
-
-  /**
-   * Format instructions for printing
-   * @param {string} instructions - Recipe instructions
-   * @returns {string} - Formatted HTML for printing
-   */
-  formatPrintInstructions(instructions) {
-    if (!instructions) return "<p>No instructions available.</p>"
-
-    // Split instructions by periods or by numbered steps
-    const steps = instructions
-      .split(/\.\s+/)
-      .filter((step) => step.trim().length > 0)
-      .map((step) => step.trim())
-
-    // Remove the last empty step if the instructions end with a period
-    if (steps[steps.length - 1] === "") {
-      steps.pop()
-    }
-
-    // If the last step doesn't end with a period, add one
-    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
-      steps[steps.length - 1] += "."
-    }
-
-    return steps
-      .map(
-        (step, index) => `
-            <div class="step">
-                <span class="step-number">${index + 1}.</span>
-                <span>${step}</span>
-            </div>
-        `,
-      )
-      .join("")
-  },
-
-  /**
-   * Share recipe
-   * @param {Object} recipe - Recipe object
-   */
-  shareRecipe(recipe) {
-    // Check if Web Share API is available
-    if (navigator.share) {
-      navigator
-        .share({
-          title: recipe.name,
-          text: `Check out this delicious ${recipe.name} recipe I found on Flavor Vault!`,
-          url: window.location.href,
-        })
-        .catch((error) => {
-          console.error("Error sharing recipe:", error)
-          this.showShareFallback(recipe)
-        })
-    } else {
-      this.showShareFallback(recipe)
-    }
-  },
-
-  /**
-   * Show fallback share options
-   * @param {Object} recipe - Recipe object
-   */
-  showShareFallback(recipe) {
-    // Create a temporary input to copy the URL
-    const input = document.createElement("input")
-    input.value = window.location.href
-    document.body.appendChild(input)
-    input.select()
-    document.execCommand("copy")
-    document.body.removeChild(input)
-
-    // Show a simple alert
-    alert("Link copied to clipboard! Share this recipe with your friends.")
-  },
-
-  /**
-   * Render category filter buttons
-   * @param {Array} categories - Array of category objects
-   * @param {Function} onCategorySelect - Callback function when a category is selected
-   */
-  renderCategoryFilters(categories, onCategorySelect) {
-    const categoryButtons = this.elements.categoryButtons
-    if (!categoryButtons) return
-
-    // Keep the "All" button
-    const allButton = categoryButtons.querySelector(".filter-btn")
-    categoryButtons.innerHTML = ""
-    categoryButtons.appendChild(allButton)
-
-    // Add category buttons
-    categories.forEach((category) => {
-      const button = document.createElement("button")
-      button.classList.add(
-        "filter-btn",
-        "bg-light-bg",
-        "dark:bg-dark-bg",
-        "border",
-        "border-light-border",
-        "dark:border-dark-border",
-        "px-4",
-        "py-2",
-        "rounded-md",
-        "font-medium",
-        "hover:bg-primary",
-        "hover:text-white",
-        "transition",
-        "duration-300",
-      )
-      button.setAttribute("data-category", category.name)
-      button.textContent = category.name
-
-      button.addEventListener("click", () => {
-        // Update active button
-        categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
-          btn.classList.remove("active", "bg-primary", "text-white")
-          btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
-        })
-        button.classList.add("active", "bg-primary", "text-white")
-        button.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
-
-        // Call the callback
-        onCategorySelect(category.name)
-      })
-
-      categoryButtons.appendChild(button)
-    })
-
-    // Add click event for "All" button
-    allButton.addEventListener("click", () => {
-      categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.remove("active", "bg-primary", "text-white")
-        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
-      })
-      allButton.classList.add("active", "bg-primary", "text-white")
-      allButton.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
-
-      onCategorySelect("all")
-    })
-  },
-
-  /**
-   * Add a recipe's ingredients to the shopping list
-   * @param {Object} recipe - Recipe object
-   */
-  addRecipeToShoppingList(recipe) {
-    // Get current shopping list
-    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
-
-    // Add each ingredient
-    recipe.ingredients.forEach((ingredient) => {
-      // Check if ingredient is already in the list
-      const existingItem = shoppingList.find((item) => item.name.toLowerCase() === ingredient.name.toLowerCase())
-
-      if (!existingItem) {
-        shoppingList.push({
-          id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
-          name: ingredient.name,
-          amount: ingredient.measure,
-          category: "Ingredients",
-          checked: false,
-        })
-      }
-    })
-
-    // Save updated shopping list
-    localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
-
-    // Show confirmation
-    alert("Ingredients added to shopping list!")
-  },
-
-  /**
-   * Add a single ingredient to the shopping list
-   * @param {string} name - Ingredient name
-   * @param {string} amount - Ingredient amount
-   * @param {string} category - Ingredient category
-   */
-  addIngredientToShoppingList(name, amount, category) {
-    // Get current shopping list
-    const shoppingList = JSON.parse(localStorage.getItem("shopping-list") || "[]")
-
-    // Check if ingredient is already in the list
-    const existingItem = shoppingList.find((item) => item.name.toLowerCase() === name.toLowerCase())
-
-    if (!existingItem) {
-      shoppingList.push({
-        id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
-        name,
-        amount,
-        category,
-        checked: false,
-      })
-
-      // Save updated shopping list
-      localStorage.setItem("shopping-list", JSON.stringify(shoppingList))
-    }
-  },
-
-  /**
-   * Load reviews for a recipe
-   * @param {string} recipeId - Recipe ID
-   */
-  loadReviews(recipeId) {
-    const reviewsContainer = document.getElementById("reviews-container")
-    if (!reviewsContainer) return
-
-    // Get ratings from localStorage
-    const ratings = JSON.parse(localStorage.getItem("recipe-ratings") || "{}")
-
-    // Check if this recipe has any ratings
-    if (!ratings[recipeId]) {
-      return
-    }
-
-    // Display the review
-    const review = ratings[recipeId]
-    const date = new Date(review.date)
-
-    reviewsContainer.innerHTML = `
-        <div class="bg-light-bg dark:bg-dark-bg rounded-lg p-4">
-            <div class="flex justify-between items-center mb-2">
-                <div class="text-highlight font-medium">
-                    ${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}
-                    <span class="ml-2">${review.rating}.0</span>
-                </div>
-                <div class="text-sm text-light-textLight dark:text-dark-textLight">
-                    ${date.toLocaleDateString()}
-                </div>
-            </div>
-            ${
-              review.review
-                ? `
-                <p class="text-light-textLight dark:text-dark-textLight">${review.review}</p>
-            `
-                : ""
-            }
+    // Create print content
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${recipe.name} - Flavor Vault</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+          }
+          h2 {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+          }
+          .meta {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+          }
+          .meta span {
+            margin-right: 15px;
+          }
+          ul {
+            padding-left: 20px;
+          }
+          li {
+            margin-bottom: 5px;
+          }
+          .instructions p {
+            margin-bottom: 15px;
+          }
+          .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>${recipe.name}</h1>
+        <div class="meta">
+          <span><strong>Category:</strong> ${recipe.category}</span>
+          <span><strong>Cuisine:</strong> ${recipe.area || "International"}</span>
+          <span><strong>Cooking Time:</strong> ${recipe.cookingTime || "30"} mins</span>
         </div>
+        
+        <h2>Ingredients</h2>
+        <ul>
+          ${recipe.ingredients
+            .map(
+              (ingredient) => `
+            <li>${ingredient.amount ? ingredient.amount + " " : ""}${ingredient.name}</li>
+          `,
+            )
+            .join("")}
+        </ul>
+        
+        <h2>Instructions</h2>
+        <div class="instructions">
+          ${recipe.instructions
+            .split("\n")
+            .map((paragraph) => `<p>${paragraph}</p>`)
+            .join("")}
+        </div>
+        
+        <div class="footer">
+          <p>Recipe from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+          }
+        </script>
+      </body>
+      </html>
     `
-  },
 
-  /**
-   * Format recipe instructions into steps
-   * @param {string} instructions - Recipe instructions text
-   * @returns {string} - Formatted HTML
-   */
-  formatInstructions(instructions) {
-    if (!instructions) return '<p class="text-light-textLight dark:text-dark-textLight">No instructions available.</p>'
-
-    // Split instructions by periods or by numbered steps
-    const steps = instructions
-      .split(/\.\s+/)
-      .filter((step) => step.trim().length > 0)
-      .map((step) => step.trim())
-
-    // Remove the last empty step if the instructions end with a period
-    if (steps[steps.length - 1] === "") {
-      steps.pop()
-    }
-
-    // If the last step doesn't end with a period, add one
-    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
-      steps[steps.length - 1] += "."
-    }
-
-    return steps
-      .map(
-        (step, index) => `
-            <div class="flex mb-4">
-                <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-4">
-                    ${index + 1}
-                </div>
-                <div class="flex-1 text-light-textLight dark:text-dark-textLight">
-                    ${step}
-                </div>
-            </div>
-        `,
-      )
-      .join("")
-  },
-
-  /**
-   * Toggle favorite status for a recipe
-   * @param {HTMLElement} button - Favorite button element
-   * @param {Object} recipe - Recipe object
-   */
-  toggleFavorite(button, recipe) {
-    if (Favorites.isFavorite(recipe.id)) {
-      Favorites.removeFavorite(recipe.id)
-      button.classList.remove("active")
-      button.textContent = "♡"
-    } else {
-      Favorites.addFavorite(recipe)
-      button.classList.add("active")
-      button.textContent = "♥"
-    }
-
-    // Update favorites view if it's currently visible
-    if (this.elements.views.favorites && this.elements.views.favorites.classList.contains("active")) {
-      this.renderFavorites(Favorites.getFavorites())
-    }
-  },
-
-  /**
-   * Print recipe
-   * @param {Object} recipe - Recipe object
-   */
-  printRecipe(recipe) {
-    const printWindow = window.open("", "_blank")
-
-    printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Print Recipe - ${recipe.name}</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 20px;
-                    }
-                    h1 {
-                        font-size: 24px;
-                        margin-bottom: 10px;
-                    }
-                    .meta {
-                        display: flex;
-                        gap: 20px;
-                        margin-bottom: 20px;
-                        color: #666;
-                    }
-                    .ingredients {
-                        margin-bottom: 30px;
-                    }
-                    .ingredients h2, .instructions h2 {
-                        font-size: 18px;
-                        margin-bottom: 10px;
-                        border-bottom: 1px solid #eee;
-                        padding-bottom: 5px;
-                    }
-                    .ingredients ul {
-                        padding-left: 20px;
-                    }
-                    .ingredients li {
-                        margin-bottom: 5px;
-                    }
-                    .step {
-                        margin-bottom: 15px;
-                    }
-                    .step-number {
-                        font-weight: bold;
-                        margin-right: 10px;
-                    }
-                    .footer {
-                        margin-top: 30px;
-                        font-size: 12px;
-                        color: #666;
-                        text-align: center;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>${recipe.name}</h1>
-                <div class="meta">
-                    <div>Category: ${recipe.category}</div>
-                    <div>Cooking Time: ${recipe.cookingTime} mins</div>
-                    <div>Rating: ${recipe.rating}/5</div>
-                </div>
-                
-                <div class="ingredients">
-                    <h2>Ingredients</h2>
-                    <ul>
-                        ${recipe.ingredients
-                          .map(
-                            (ingredient) => `
-                            <li>${ingredient.measure} ${ingredient.name}</li>
-                        `,
-                          )
-                          .join("")}
-                    </ul>
-                </div>
-                
-                <div class="instructions">
-                    <h2>Instructions</h2>
-                    ${this.formatPrintInstructions(recipe.instructions)}
-                </div>
-                
-                <div class="footer">
-                    <p>Recipe from Flavor Vault - Printed on ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <script>
-                    window.onload = function() {
-                        window.print();
-                    }
-                </script>
-            </body>
-            </html>
-        `)
-
+    // Write content to print window
+    printWindow.document.write(printContent)
     printWindow.document.close()
   },
 
   /**
-   * Format instructions for printing
-   * @param {string} instructions - Recipe instructions
-   * @returns {string} - Formatted HTML for printing
-   */
-  formatPrintInstructions(instructions) {
-    if (!instructions) return "<p>No instructions available.</p>"
-
-    // Split instructions by periods or by numbered steps
-    const steps = instructions
-      .split(/\.\s+/)
-      .filter((step) => step.trim().length > 0)
-      .map((step) => step.trim())
-
-    // Remove the last empty step if the instructions end with a period
-    if (steps[steps.length - 1] === "") {
-      steps.pop()
-    }
-
-    // If the last step doesn't end with a period, add one
-    if (steps.length > 0 && !steps[steps.length - 1].endsWith(".")) {
-      steps[steps.length - 1] += "."
-    }
-
-    return steps
-      .map(
-        (step, index) => `
-            <div class="step">
-                <span class="step-number">${index + 1}.</span>
-                <span>${step}</span>
-            </div>
-        `,
-      )
-      .join("")
-  },
-
-  /**
-   * Share recipe
-   * @param {Object} recipe - Recipe object
-   */
-  shareRecipe(recipe) {
-    // Check if Web Share API is available
-    if (navigator.share) {
-      navigator
-        .share({
-          title: recipe.name,
-          text: `Check out this delicious ${recipe.name} recipe I found on Flavor Vault!`,
-          url: window.location.href,
-        })
-        .catch((error) => {
-          console.error("Error sharing recipe:", error)
-          this.showShareFallback(recipe)
-        })
-    } else {
-      this.showShareFallback(recipe)
-    }
-  },
-
-  /**
-   * Show fallback share options
-   * @param {Object} recipe - Recipe object
-   */
-  showShareFallback(recipe) {
-    // Create a temporary input to copy the URL
-    const input = document.createElement("input")
-    input.value = window.location.href
-    document.body.appendChild(input)
-    input.select()
-    document.execCommand("copy")
-    document.body.removeChild(input)
-
-    // Show a simple alert
-    alert("Link copied to clipboard! Share this recipe with your friends.")
-  },
-
-  /**
-   * Render category filter buttons
+   * Render category filters
    * @param {Array} categories - Array of category objects
-   * @param {Function} onCategorySelect - Callback function when a category is selected
+   * @param {Function} handleCategorySelect - Function to handle category selection
    */
-  renderCategoryFilters(categories, onCategorySelect) {
-    const categoryButtons = this.elements.categoryButtons
-    if (!categoryButtons) return
+  renderCategoryFilters(categories, handleCategorySelect) {
+    const categoryButtons = document.getElementById("category-buttons")
 
-    // Keep the "All" button
-    const allButton = categoryButtons.querySelector(".filter-btn")
-    categoryButtons.innerHTML = ""
-    categoryButtons.appendChild(allButton)
+    if (categoryButtons) {
+      // Add category buttons
+      categories.forEach((category) => {
+        const button = document.createElement("button")
+        button.className =
+          "filter-btn bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border px-4 py-2 rounded-md font-medium hover:bg-primary hover:text-white transition duration-300"
+        button.setAttribute("data-category", category.name)
+        button.textContent = category.name
 
-    // Add category buttons
-    categories.forEach((category) => {
-      const button = document.createElement("button")
-      button.classList.add(
-        "filter-btn",
-        "bg-light-bg",
-        "dark:bg-dark-bg",
-        "border",
-        "border-light-border",
-        "dark:border-dark-border",
-        "px-4",
-        "py-2",
-        "rounded-md",
-        "font-medium",
-        "hover:bg-primary",
-        "hover:text-white",
-        "transition",
-        "duration-300",
-      )
-      button.setAttribute("data-category", category.name)
-      button.textContent = category.name
-
-      button.addEventListener("click", () => {
-        // Update active button
-        categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
-          btn.classList.remove("active", "bg-primary", "text-white")
-          btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+        button.addEventListener("click", () => {
+          handleCategorySelect(category.name)
         })
-        button.classList.add("active", "bg-primary", "text-white")
-        button.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
 
-        // Call the callback
-        onCategorySelect(category.name)
+        categoryButtons.appendChild(button)
       })
+    }
+  },
 
-      categoryButtons.appendChild(button)
-    })
+  /**
+   * Show toast message
+   * @param {string} message - Toast message
+   * @param {string} type - Toast type (success, error, info)
+   */
+  showToast(message, type = "success") {
+    // Check if toast container exists
+    let toastContainer = document.getElementById("toast-container")
 
-    // Add click event for "All" button
-    allButton.addEventListener("click", () => {
-      categoryButtons.querySelectorAll(".filter-btn").forEach((btn) => {
-        btn.classList.remove("active", "bg-primary", "text-white")
-        btn.classList.add("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
-      })
-      allButton.classList.add("active", "bg-primary", "text-white")
-      allButton.classList.remove("bg-light-bg", "dark:bg-dark-bg", "text-light-text", "dark:text-dark-text")
+    // Create toast container if it doesn't exist
+    if (!toastContainer) {
+      toastContainer = document.createElement("div")
+      toastContainer.id = "toast-container"
+      toastContainer.className = "fixed bottom-4 right-4 z-50"
+      document.body.appendChild(toastContainer)
+    }
 
-      onCategorySelect("all")
-    })
+    // Create toast element
+    const toast = document.createElement("div")
+    toast.className = `flex items-center p-4 mb-3 rounded-md shadow-lg animate-fade-in ${
+      type === "success" ? "bg-green-500" : type === "error" ? "bg-red-500" : "bg-blue-500"
+    } text-white`
+
+    // Set toast content
+    toast.innerHTML = `
+      <i class="fas ${
+        type === "success" ? "fa-check-circle" : type === "error" ? "fa-exclamation-circle" : "fa-info-circle"
+      } mr-2"></i>
+      <span>${message}</span>
+    `
+
+    // Add toast to container
+    toastContainer.appendChild(toast)
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+      toast.classList.add("animate-fade-out")
+      setTimeout(() => {
+        toast.remove()
+      }, 300)
+    }, 3000)
   },
 }
 

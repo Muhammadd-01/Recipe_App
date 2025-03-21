@@ -1552,23 +1552,157 @@ document.addEventListener("DOMContentLoaded", () => {
   initRecipeRating()
   initSocialSharing()
 
-  // Setup modal triggers
-  setupModalTriggers()
+  // Make sure UI is initialized properly
+  if (window.UI && typeof window.UI.init === "function") {
+    window.UI.init()
+  } else {
+    console.error("UI module not found or init method not available")
+  }
+
+  // Make sure DarkMode is initialized properly
+  if (window.DarkMode && typeof window.DarkMode.init === "function") {
+    window.DarkMode.init()
+  } else {
+    console.error("DarkMode module not found or init method not available")
+  }
 
   // Fix dark mode toggle
   const themeToggle = document.getElementById("theme-toggle")
   const mobileThemeToggle = document.getElementById("mobile-theme-toggle")
 
-  if (themeToggle) {
-    themeToggle.checked = DarkMode.isDarkMode()
-    DarkMode.updateToggleAppearance(themeToggle)
+  if (themeToggle && window.DarkMode) {
+    themeToggle.checked = window.DarkMode.isDarkMode()
+    window.DarkMode.updateToggleAppearance(themeToggle)
+
+    // Add event listener to ensure it works
+    themeToggle.addEventListener("change", () => {
+      console.log("Theme toggle changed")
+      window.DarkMode.toggleTheme()
+    })
   }
 
-  if (mobileThemeToggle) {
-    mobileThemeToggle.checked = DarkMode.isDarkMode()
-    DarkMode.updateToggleAppearance(mobileThemeToggle)
+  if (mobileThemeToggle && window.DarkMode) {
+    mobileThemeToggle.checked = window.DarkMode.isDarkMode()
+    window.DarkMode.updateToggleAppearance(mobileThemeToggle)
+
+    // Add event listener to ensure it works
+    mobileThemeToggle.addEventListener("change", () => {
+      console.log("Mobile theme toggle changed")
+      window.DarkMode.toggleTheme()
+    })
   }
+
+  // Ensure toggle dark mode button works
+  const toggleDarkModeBtn = document.getElementById("toggle-dark-mode-btn")
+  if (toggleDarkModeBtn && window.DarkMode) {
+    toggleDarkModeBtn.addEventListener("click", () => {
+      console.log("Toggle dark mode button clicked")
+      window.DarkMode.toggleTheme()
+
+      // Update toggle states
+      if (themeToggle) {
+        themeToggle.checked = window.DarkMode.isDarkMode()
+        window.DarkMode.updateToggleAppearance(themeToggle)
+      }
+
+      if (mobileThemeToggle) {
+        mobileThemeToggle.checked = window.DarkMode.isDarkMode()
+        window.DarkMode.updateToggleAppearance(mobileThemeToggle)
+      }
+    })
+  }
+
+  // Manually setup modal triggers as a fallback
+  setupModalTriggers()
 
   console.log("App fully initialized")
 })
+
+// Add this function to ensure modal triggers are set up
+function setupModalTriggers() {
+  console.log("Setting up modal triggers (fallback)")
+
+  // Direct modal buttons
+  const modalTriggers = [
+    { triggerId: "show-account-modal-btn", modalId: "login-modal" },
+    { triggerId: "user-account-btn", modalId: "login-modal" },
+    { triggerId: "mobile-user-account-btn", modalId: "login-modal" },
+    { triggerId: "show-shopping-list-modal-btn", modalId: "shopping-list-modal" },
+    { triggerId: "show-submit-recipe-modal-btn", modalId: "submit-recipe-modal" },
+    { triggerId: "show-rate-recipe-modal-btn", modalId: "rate-recipe-modal" },
+    { triggerId: "show-share-recipe-modal-btn", modalId: "share-recipe-modal" },
+  ]
+
+  modalTriggers.forEach(({ triggerId, modalId }) => {
+    const trigger = document.getElementById(triggerId)
+    const modal = document.getElementById(modalId)
+
+    if (trigger && modal) {
+      console.log(`Setting up modal trigger: ${triggerId} -> ${modalId}`)
+
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault()
+        console.log(`Opening modal: ${modalId}`)
+        modal.classList.remove("hidden")
+
+        // Special handling for specific modals
+        if (modalId === "rate-recipe-modal") {
+          const recipeNameElement = document.getElementById("rate-recipe-name")
+          if (recipeNameElement) {
+            recipeNameElement.textContent = "Sample Recipe"
+          }
+        }
+
+        if (modalId === "share-recipe-modal") {
+          const recipeNameElement = document.getElementById("share-recipe-name")
+          if (recipeNameElement) {
+            recipeNameElement.textContent = "Sample Recipe"
+          }
+
+          const shareLinkInput = document.getElementById("share-link")
+          if (shareLinkInput) {
+            shareLinkInput.value = window.location.href
+          }
+        }
+      })
+    } else {
+      if (!trigger) console.warn(`Trigger element not found: ${triggerId}`)
+      if (!modal) console.warn(`Modal element not found: ${modalId}`)
+    }
+  })
+
+  // Close buttons for all modals
+  const closeButtons = document.querySelectorAll('[id^="close-"][id$="-modal-btn"]')
+  closeButtons.forEach((button) => {
+    const modalId = button.id.replace("close-", "").replace("-btn", "")
+    const modal = document.getElementById(modalId)
+
+    if (button && modal) {
+      button.addEventListener("click", () => {
+        console.log(`Closing ${modalId}`)
+        modal.classList.add("hidden")
+      })
+    }
+  })
+
+  // Switch between login and signup
+  const modalSwitches = [
+    { triggerId: "show-signup-btn", fromModalId: "login-modal", toModalId: "signup-modal" },
+    { triggerId: "show-login-btn", fromModalId: "signup-modal", toModalId: "login-modal" },
+  ]
+
+  modalSwitches.forEach(({ triggerId, fromModalId, toModalId }) => {
+    const trigger = document.getElementById(triggerId)
+    const fromModal = document.getElementById(fromModalId)
+    const toModal = document.getElementById(toModalId)
+
+    if (trigger && fromModal && toModal) {
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault()
+        fromModal.classList.add("hidden")
+        toModal.classList.remove("hidden")
+      })
+    }
+  })
+}
 
