@@ -288,94 +288,100 @@ const UI = {
     if (!this.elements.recipeDetailsContainer) return
 
     this.elements.recipeDetailsContainer.innerHTML = `
-            <div class="relative">
-                <div class="h-64 md:h-96 overflow-hidden">
-                    <img src="${recipe.thumbnail}" alt="${recipe.name}" class="w-full h-full object-cover">
-                </div>
-                <button class="favorite-btn absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center text-2xl ${Favorites.isFavorite(recipe.id) ? "active" : ""}">${Favorites.isFavorite(recipe.id) ? "♥" : "♡"}</button>
-                <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black to-transparent p-6">
-                    <div class="text-white">
-                        <span class="bg-primary text-white text-sm font-medium py-1 px-2 rounded-sm">${recipe.category}</span>
-                        <h2 class="font-heading text-2xl md:text-3xl font-bold mt-2">${recipe.name}</h2>
-                    </div>
+        <div class="relative">
+            <div class="h-64 md:h-96 overflow-hidden">
+                <img src="${recipe.thumbnail}" alt="${recipe.name}" class="w-full h-full object-cover">
+            </div>
+            <button class="favorite-btn absolute top-4 right-4 bg-white bg-opacity-80 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center text-2xl ${Favorites.isFavorite(recipe.id) ? "active" : ""}">${Favorites.isFavorite(recipe.id) ? "♥" : "♡"}</button>
+            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black to-transparent p-6">
+                <div class="text-white">
+                    <span class="bg-primary text-white text-sm font-medium py-1 px-2 rounded-sm">${recipe.category}</span>
+                    <h2 class="font-heading text-2xl md:text-3xl font-bold mt-2">${recipe.name}</h2>
                 </div>
             </div>
-            <div class="p-6 md:p-8">
-                <div class="flex flex-wrap gap-4 mb-6 text-light-textLight dark:text-dark-textLight">
-                    <div class="flex items-center">
-                        <i class="fas fa-globe-americas mr-2 text-primary"></i>
-                        <span>${recipe.area || "International"}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-star mr-2 text-highlight"></i>
-                        <span>${recipe.rating} Rating</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="far fa-clock mr-2 text-primary"></i>
-                        <span>${recipe.cookingTime} mins</span>
-                    </div>
-                    <div class="flex items-center">
-                        <i class="fas fa-utensils mr-2 text-primary"></i>
-                        <span>${recipe.ingredients.length} Ingredients</span>
-                    </div>
+        </div>
+        <div class="p-6 md:p-8">
+            <div class="flex flex-wrap gap-4 mb-6 text-light-textLight dark:text-dark-textLight">
+                <div class="flex items-center">
+                    <i class="fas fa-globe-americas mr-2 text-primary"></i>
+                    <span>${recipe.area || "International"}</span>
                 </div>
-                
-                <div class="flex gap-4 mb-8">
-                    <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                        <i class="fas fa-print mr-2"></i> Print Recipe
-                    </button>
-                    <button class="share-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
-                        <i class="fas fa-share-alt mr-2"></i> Share Recipe
-                    </button>
+                <div class="flex items-center">
+                    <i class="fas fa-star mr-2 text-highlight"></i>
+                    <span>${recipe.rating} Rating</span>
                 </div>
-                
-                <div class="mb-8">
-                    <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Ingredients</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        ${recipe.ingredients
-                          .map(
-                            (ingredient) => `
-                            <div class="flex items-center p-3 bg-light-bg dark:bg-dark-bg rounded-md">
-                                <i class="fas fa-check-circle text-secondary mr-3"></i>
-                                <span class="dark:text-dark-text">${ingredient.measure} ${ingredient.name}</span>
-                            </div>
-                        `,
-                          )
-                          .join("")}
-                    </div>
+                <div class="flex items-center">
+                    <i class="far fa-clock mr-2 text-primary"></i>
+                    <span>${recipe.cookingTime} mins</span>
                 </div>
-                
-                <div class="mb-8">
-                    <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Instructions</h3>
-                    ${this.formatInstructions(recipe.instructions)}
+                <div class="flex items-center">
+                    <i class="fas fa-utensils mr-2 text-primary"></i>
+                    <span>${recipe.ingredients.length} Ingredients</span>
                 </div>
-                
-                ${
-                  recipe.youtube
-                    ? `
-                <div class="mb-8">
-                    <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Video Tutorial</h3>
-                    <a href="${recipe.youtube}" target="_blank" class="inline-flex items-center bg-red-600 text-white font-medium py-2 px-4 rounded-md hover:bg-red-700 transition duration-300">
-                        <i class="fab fa-youtube mr-2"></i> Watch on YouTube
-                    </a>
-                </div>
-                `
-                    : ""
-                }
-                
-                ${
-                  recipe.source
-                    ? `
-                <div class="pt-6 border-t border-light-border dark:border-dark-border">
-                    <p class="text-light-textLight dark:text-dark-textLight">
-                        Source: <a href="${recipe.source}" target="_blank" class="text-primary hover:underline">Original Recipe</a>
-                    </p>
-                </div>
-                `
-                    : ""
-                }
             </div>
-        `
+            
+            <div class="flex flex-wrap gap-4 mb-8">
+                <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                    <i class="fas fa-print mr-2"></i> Print Recipe
+                </button>
+                <button class="share-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                    <i class="fas fa-share-alt mr-2"></i> Share Recipe
+                </button>
+                <button class="find-restaurants-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-dish-name="${recipe.name}">
+                    <i class="fas fa-utensils mr-2"></i> Find Restaurants
+                </button>
+                <button class="add-to-plan-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
+                    <i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan
+                </button>
+            </div>
+            
+            <div class="mb-8">
+                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Ingredients</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    ${recipe.ingredients
+                      .map(
+                        (ingredient) => `
+                        <div class="flex items-center p-3 bg-light-bg dark:bg-dark-bg rounded-md hover:bg-gray-100 dark:hover:bg-opacity-10 transition duration-300">
+                            <i class="fas fa-check-circle text-secondary mr-3"></i>
+                            <span class="dark:text-dark-text">${ingredient.measure} ${ingredient.name}</span>
+                        </div>
+                    `,
+                      )
+                      .join("")}
+                </div>
+            </div>
+            
+            <div class="mb-8">
+                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Instructions</h3>
+                ${this.formatInstructions(recipe.instructions)}
+            </div>
+            
+            ${
+              recipe.youtube
+                ? `
+            <div class="mb-8">
+                <h3 class="font-heading text-xl font-bold mb-4 dark:text-dark-text">Video Tutorial</h3>
+                <a href="${recipe.youtube}" target="_blank" class="inline-flex items-center bg-red-600 text-white font-medium py-2 px-4 rounded-md hover:bg-red-700 transition duration-300">
+                    <i class="fab fa-youtube mr-2"></i> Watch on YouTube
+                </a>
+            </div>
+            `
+                : ""
+            }
+            
+            ${
+              recipe.source
+                ? `
+            <div class="pt-6 border-t border-light-border dark:border-dark-border">
+                <p class="text-light-textLight dark:text-dark-textLight">
+                    Source: <a href="${recipe.source}" target="_blank" class="text-primary hover:underline">Original Recipe</a>
+                </p>
+            </div>
+            `
+                : ""
+            }
+        </div>
+    `
 
     // Add favorite toggle event listener
     const favoriteBtn = this.elements.recipeDetailsContainer.querySelector(".favorite-btn")
@@ -393,6 +399,22 @@ const UI = {
     const shareBtn = this.elements.recipeDetailsContainer.querySelector(".share-recipe-btn")
     shareBtn.addEventListener("click", () => {
       this.shareRecipe(recipe)
+    })
+
+    // Add find restaurants event listener
+    const findRestaurantsBtn = this.elements.recipeDetailsContainer.querySelector(".find-restaurants-btn")
+    findRestaurantsBtn.addEventListener("click", () => {
+      if (window.RestaurantFinder) {
+        window.RestaurantFinder.showRestaurantFinderModal(recipe.name)
+      }
+    })
+
+    // Add to meal plan event listener
+    const addToPlanBtn = this.elements.recipeDetailsContainer.querySelector(".add-to-plan-btn")
+    addToPlanBtn.addEventListener("click", () => {
+      if (window.MealPlanner) {
+        window.MealPlanner.showAddToPlanModal(recipe.id, recipe.name, recipe.thumbnail)
+      }
     })
 
     this.showView("recipe-details")

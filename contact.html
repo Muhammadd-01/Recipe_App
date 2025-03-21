@@ -416,11 +416,79 @@
                 });
             });
             
-            // Contact form submission
+            // Enhanced contact form validation and submission
             const contactForm = document.getElementById('contact-form');
+            const formInputs = contactForm.querySelectorAll('input, textarea');
+            
+            // Add validation styles
+            formInputs.forEach(input => {
+                // Add focus and blur event listeners for animation
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('focused');
+                    input.classList.add('ring-2', 'ring-primary');
+                });
+                
+                input.addEventListener('blur', () => {
+                    input.parentElement.classList.remove('focused');
+                    input.classList.remove('ring-2', 'ring-primary');
+                    
+                    // Validate on blur
+                    validateInput(input);
+                });
+            });
+            
+            // Validate single input
+            function validateInput(input) {
+                const errorElement = input.parentElement.querySelector('.error-message');
+                
+                // Remove any existing error message
+                if (errorElement) {
+                    errorElement.remove();
+                }
+                
+                // Check if input is valid
+                if (input.validity.valid) {
+                    input.classList.remove('border-red-500');
+                    return true;
+                } else {
+                    // Add error message
+                    const error = document.createElement('p');
+                    error.className = 'error-message text-red-500 text-sm mt-1 animate-fade-in';
+                    
+                    if (input.validity.valueMissing) {
+                        error.textContent = `${input.name.charAt(0).toUpperCase() + input.name.slice(1)} is required`;
+                    } else if (input.validity.typeMismatch && input.type === 'email') {
+                        error.textContent = 'Please enter a valid email address';
+                    } else {
+                        error.textContent = 'Please enter a valid value';
+                    }
+                    
+                    input.parentElement.appendChild(error);
+                    input.classList.add('border-red-500');
+                    return false;
+                }
+            }
+            
+            // Validate all inputs
+            function validateForm() {
+                let isValid = true;
+                
+                formInputs.forEach(input => {
+                    if (!validateInput(input)) {
+                        isValid = false;
+                    }
+                });
+                
+                return isValid;
+            }
             
             contactForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                // Validate form
+                if (!validateForm()) {
+                    return;
+                }
                 
                 // Simulate form submission
                 const submitButton = contactForm.querySelector('button[type="submit"]');
@@ -435,6 +503,15 @@
                     contactForm.reset();
                     
                     // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4 animate-fade-in';
+                    successMessage.innerHTML = `
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Your message has been sent. We'll get back to you soon!</span>
+                    `;
+                    
+                    contactForm.appendChild(successMessage);
+                    
                     submitButton.innerHTML = '<i class="fas fa-check mr-2"></i> Message Sent!';
                     submitButton.classList.add('bg-secondary');
                     
@@ -443,8 +520,38 @@
                         submitButton.innerHTML = originalText;
                         submitButton.disabled = false;
                         submitButton.classList.remove('bg-secondary');
+                        
+                        // Remove success message with fade out
+                        successMessage.style.opacity = '0';
+                        successMessage.style.transition = 'opacity 0.5s ease';
+                        
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 500);
                     }, 3000);
                 }, 1500);
+            });
+            
+            // FAQ accordion functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                const answer = item.querySelector('.faq-answer');
+                
+                question.addEventListener('click', () => {
+                    // Close all other answers
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.querySelector('.faq-answer').classList.add('hidden');
+                            otherItem.querySelector('.faq-icon').classList.remove('rotate-180');
+                        }
+                    });
+                    
+                    // Toggle current answer
+                    answer.classList.toggle('hidden');
+                    item.querySelector('.faq-icon').classList.toggle('rotate-180');
+                });
             });
         });
     </script>

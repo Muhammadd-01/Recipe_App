@@ -314,6 +314,22 @@
                     <!-- Recipe details will be dynamically added here -->
                 </article>
                 
+                <!-- Add restaurant finder button to recipe details view -->
+                <div class="flex gap-4 mb-8">
+                    <button class="print-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                        <i class="fas fa-print mr-2"></i> Print Recipe
+                    </button>
+                    <button class="share-recipe-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300">
+                        <i class="fas fa-share-alt mr-2"></i> Share Recipe
+                    </button>
+                    <button class="find-restaurants-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-dish-name="${recipe.name}">
+                        <i class="fas fa-utensils mr-2"></i> Find Restaurants
+                    </button>
+                    <button class="add-to-plan-btn flex items-center text-light-textLight dark:text-dark-textLight hover:text-primary transition duration-300" data-recipe-id="${recipe.id}" data-recipe-name="${recipe.name}" data-recipe-image="${recipe.thumbnail}">
+                        <i class="fas fa-calendar-plus mr-2"></i> Add to Meal Plan
+                    </button>
+                </div>
+                
                 <!-- Similar Recipes (New) -->
                 <div id="similar-recipes-section" class="mt-12 hidden">
                     <h3 class="font-heading text-2xl font-bold mb-6">You Might Also Like</h3>

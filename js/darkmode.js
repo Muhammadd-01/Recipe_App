@@ -19,21 +19,25 @@ const DarkMode = {
 
     // Update toggle states
     toggleInputs.forEach((input) => {
-      input.checked = this.isDarkMode()
+      if (input) {
+        input.checked = this.isDarkMode()
 
-      // Update toggle appearance
-      this.updateToggleAppearance(input)
+        // Update toggle appearance
+        this.updateToggleAppearance(input)
 
-      // Add event listener for theme toggle
-      input.addEventListener("change", () => {
-        this.toggleTheme()
+        // Add event listener for theme toggle
+        input.addEventListener("change", () => {
+          this.toggleTheme()
 
-        // Update all toggles to match
-        toggleInputs.forEach((otherInput) => {
-          otherInput.checked = this.isDarkMode()
-          this.updateToggleAppearance(otherInput)
+          // Update all toggles to match
+          toggleInputs.forEach((otherInput) => {
+            if (otherInput) {
+              otherInput.checked = this.isDarkMode()
+              this.updateToggleAppearance(otherInput)
+            }
+          })
         })
-      })
+      }
     })
 
     // Add keyboard shortcut for theme toggle (Alt+T)
@@ -41,8 +45,10 @@ const DarkMode = {
       if (e.altKey && e.key === "t") {
         this.toggleTheme()
         toggleInputs.forEach((input) => {
-          input.checked = this.isDarkMode()
-          this.updateToggleAppearance(input)
+          if (input) {
+            input.checked = this.isDarkMode()
+            this.updateToggleAppearance(input)
+          }
         })
       }
     })
@@ -53,6 +59,8 @@ const DarkMode = {
    * @param {HTMLElement} input - Toggle input element
    */
   updateToggleAppearance(input) {
+    if (!input) return
+
     const label = input.nextElementSibling
     if (label) {
       const slider = label.querySelector("div")
@@ -76,6 +84,7 @@ const DarkMode = {
       // Use saved theme preference
       if (savedTheme === "dark") {
         document.documentElement.classList.add("dark")
+        document.body.classList.add("dark")
       }
     } else {
       // Check for system preference
@@ -83,6 +92,7 @@ const DarkMode = {
 
       if (prefersDark) {
         document.documentElement.classList.add("dark")
+        document.body.classList.add("dark")
         localStorage.setItem(this.storageKey, "dark")
       } else {
         localStorage.setItem(this.storageKey, "light")
@@ -100,8 +110,10 @@ const DarkMode = {
       if (!localStorage.getItem(this.storageKey)) {
         if (e.matches) {
           document.documentElement.classList.add("dark")
+          document.body.classList.add("dark")
         } else {
           document.documentElement.classList.remove("dark")
+          document.body.classList.remove("dark")
         }
       }
     })
@@ -113,9 +125,11 @@ const DarkMode = {
   toggleTheme() {
     if (this.isDarkMode()) {
       document.documentElement.classList.remove("dark")
+      document.body.classList.remove("dark")
       localStorage.setItem(this.storageKey, "light")
     } else {
       document.documentElement.classList.add("dark")
+      document.body.classList.add("dark")
       localStorage.setItem(this.storageKey, "dark")
     }
 
@@ -132,7 +146,7 @@ const DarkMode = {
    * @returns {boolean} - True if dark mode is active
    */
   isDarkMode() {
-    return document.documentElement.classList.contains("dark")
+    return document.documentElement.classList.contains("dark") || document.body.classList.contains("dark")
   },
 }
 

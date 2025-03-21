@@ -29,11 +29,13 @@ const App = {
     // Initialize Search
     Search.init(API)
 
-    // Initialize Meal Planner
+    // Initialize Meal Planner and make it globally available
     MealPlanner.init()
+    window.MealPlanner = MealPlanner
 
-    // Initialize Restaurant Finder
+    // Initialize Restaurant Finder and make it globally available
     RestaurantFinder.init()
+    window.RestaurantFinder = RestaurantFinder
 
     // Set up event listeners
     this.setupEventListeners()

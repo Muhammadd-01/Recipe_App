@@ -63,11 +63,57 @@
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out;
         }
         .animate-slide-up {
             animation: slideUp 0.5s ease-out;
+        }
+        .animate-slide-left {
+            animation: slideInLeft 0.5s ease-out;
+        }
+        .animate-slide-right {
+            animation: slideInRight 0.5s ease-out;
+        }
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Team member hover effect */
+        .team-member {
+            transition: all 0.3s ease;
+        }
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        .team-member img {
+            transition: all 0.5s ease;
+        }
+        .team-member:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Testimonial hover effect */
+        .testimonial {
+            transition: all 0.3s ease;
+        }
+        .testimonial:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -197,7 +243,7 @@
                 <h2 class="font-heading text-3xl font-bold mb-8 text-center dark:text-dark-text">Meet Our Team</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Team Member 1 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                    <div class="team-member bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
                         <div class="h-64 overflow-hidden">
                             <img src="/placeholder.svg?height=400&width=400" alt="Maria Rodriguez" class="w-full h-full object-cover">
                         </div>
@@ -220,7 +266,7 @@
                     </div>
                     
                     <!-- Team Member 2 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                    <div class="team-member bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
                         <div class="h-64 overflow-hidden">
                             <img src="/placeholder.svg?height=400&width=400" alt="David Chen" class="w-full h-full object-cover">
                         </div>
@@ -243,7 +289,7 @@
                     </div>
                     
                     <!-- Team Member 3 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                    <div class="team-member bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
                         <div class="h-64 overflow-hidden">
                             <img src="/placeholder.svg?height=400&width=400" alt="Sophia Johnson" class="w-full h-full object-cover">
                         </div>
@@ -266,7 +312,7 @@
                     </div>
                     
                     <!-- Team Member 4 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
+                    <div class="team-member bg-white dark:bg-dark-card rounded-xl overflow-hidden shadow-lg text-center animate-fade-in">
                         <div class="h-64 overflow-hidden">
                             <img src="/placeholder.svg?height=400&width=400" alt="Michael Thompson" class="w-full h-full object-cover">
                         </div>
@@ -295,7 +341,7 @@
                 <h2 class="font-heading text-3xl font-bold mb-8 text-center dark:text-dark-text">What Our Users Say</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Testimonial 1 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                    <div class="testimonial bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
                         <div class="text-highlight text-xl mb-4">★★★★★</div>
                         <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"Flavor Vault has completely transformed my cooking. The recipes are easy to follow and always delicious. My family can't believe I made these dishes!"</p>
                         <div class="flex items-center">
@@ -310,7 +356,7 @@
                     </div>
                     
                     <!-- Testimonial 2 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                    <div class="testimonial bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
                         <div class="text-highlight text-xl mb-4">★★★★★</div>
                         <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"As someone who never cooked before, this site has been a lifesaver. The step-by-step instructions and photos make it impossible to mess up!"</p>
                         <div class="flex items-center">
@@ -325,7 +371,7 @@
                     </div>
                     
                     <!-- Testimonial 3 -->
-                    <div class="bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
+                    <div class="testimonial bg-white dark:bg-dark-card rounded-xl p-6 shadow-lg animate-fade-in">
                         <div class="text-highlight text-xl mb-4">★★★★★</div>
                         <p class="italic mb-4 text-light-textLight dark:text-dark-textLight">"I love how diverse the recipes are. I've discovered so many international dishes that have become family favorites. The search and filter options make it easy to find exactly what I want."</p>
                         <div class="flex items-center">
