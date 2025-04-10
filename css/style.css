@@ -2,9 +2,14 @@
 :root {
   /* Main color scheme */
   --primary-color: #ff8a00; /* Orange */
+  --primary-color-rgb: 255, 138, 0;
+  --primary-color-hover: #e67e00;
   --secondary-color: #4caf50; /* Green */
+  --secondary-color-hover: #3d9140;
   --accent-color: #8d6e63; /* Brown */
+  --accent-color-hover: #7d5e53;
   --highlight-color: #ffc107; /* Yellow */
+  --highlight-color-hover: #e5ac06;
 
   /* Light theme */
   --bg-primary: #fff9eb;
@@ -429,6 +434,23 @@ img {
   font-weight: 700;
   color: var(--primary-color);
   font-size: 1.8rem;
+  position: relative;
+  display: inline-block;
+}
+
+.logo h1::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.logo:hover h1::after {
+  width: 100%;
 }
 
 .main-nav ul {
@@ -447,6 +469,27 @@ img {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   display: inline-block;
+  position: relative;
+}
+
+.main-nav a::after,
+.main-nav button::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.main-nav a:hover::after,
+.main-nav button:hover::after,
+.main-nav a.active::after,
+.main-nav button.active::after {
+  width: 100%;
+  left: 0;
 }
 
 .main-nav a.active,
@@ -475,6 +518,12 @@ img {
   padding: var(--spacing-sm) 0;
   color: var(--text-primary);
   font-weight: 500;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  transform: translateX(5px);
 }
 
 /* Theme Toggle */
@@ -500,6 +549,7 @@ img {
   border-radius: 100px;
   position: relative;
   padding: 0 var(--spacing-xs);
+  overflow: hidden;
 }
 
 .toggle-icon {
@@ -516,11 +566,17 @@ img {
   height: 20px;
   background-color: white;
   border-radius: 50%;
-  transition: var(--transition);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .theme-toggle-input:checked + .theme-toggle-label::after {
   transform: translateX(24px);
+  background-color: var(--bg-primary);
+}
+
+.theme-toggle-label:hover::after {
+  box-shadow: 0 0 5px 2px rgba(255, 138, 0, 0.5);
 }
 
 /* Hero Section */
@@ -529,28 +585,48 @@ img {
   color: white;
   padding: var(--spacing-xxl) 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80")
+    center / cover;
+  opacity: 0.2;
+  z-index: 0;
 }
 
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .hero h2 {
   font-family: var(--font-heading);
   font-size: 2.5rem;
   margin-bottom: var(--spacing-md);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .hero p {
   font-size: 1.2rem;
   margin-bottom: var(--spacing-lg);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .search-container {
   display: flex;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
 }
 
 .search-container input {
@@ -560,6 +636,7 @@ img {
   border-radius: var(--radius-md) 0 0 var(--radius-md);
   font-size: 1rem;
   outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .search-container button {
@@ -569,22 +646,56 @@ img {
   padding: 0 var(--spacing-lg);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .search-container button:hover {
-  background-color: #7d5e53;
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+}
+
+.search-container button:active {
+  transform: translateY(0);
+}
+
+/* Autocomplete */
+.autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid var(--border-color);
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg-secondary);
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 /* Category Filter */
 .category-filter {
   padding: var(--spacing-lg) 0;
   background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  margin-bottom: var(--spacing-lg);
 }
 
 .category-filter h3 {
   margin-bottom: var(--spacing-md);
   font-family: var(--font-heading);
   color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .filter-buttons {
@@ -600,16 +711,37 @@ img {
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-md);
   font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .filter-btn:hover {
   background-color: var(--primary-color);
   color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn:hover::before {
+  left: 100%;
 }
 
 .filter-btn.active {
   background-color: var(--primary-color);
   color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Main Content Area */
@@ -619,6 +751,7 @@ img {
 
 .app-view {
   display: none;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .app-view.active {
@@ -631,6 +764,19 @@ img {
   color: var(--text-primary);
   font-size: 1.8rem;
   font-weight: 700;
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--spacing-xs);
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-color);
 }
 
 /* Recipe Grid */
@@ -646,12 +792,13 @@ img {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--card-shadow);
-  transition: var(--transition);
+  transition: all 0.4s ease;
+  position: relative;
 }
 
 .recipe-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .recipe-image {
@@ -668,7 +815,25 @@ img {
 }
 
 .recipe-card:hover .recipe-image img {
-  transform: scale(1.05);
+  transform: scale(1.1);
+}
+
+.recipe-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 70%, rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.recipe-card:hover::before {
+  opacity: 1;
 }
 
 .favorite-btn {
@@ -684,12 +849,14 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  z-index: 2;
 }
 
 .favorite-btn:hover {
   background: white;
-  transform: scale(1.1);
+  transform: scale(1.2) rotate(10deg);
+  box-shadow: 0 0 10px rgba(255, 138, 0, 0.5);
 }
 
 .favorite-btn.active {
@@ -698,6 +865,8 @@ img {
 
 .recipe-content {
   padding: var(--spacing-md);
+  position: relative;
+  z-index: 2;
 }
 
 .recipe-title {
@@ -705,6 +874,11 @@ img {
   font-size: 1.2rem;
   margin-bottom: var(--spacing-sm);
   color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.recipe-card:hover .recipe-title {
+  color: var(--primary-color);
 }
 
 .recipe-meta {
@@ -719,6 +893,12 @@ img {
   padding: 2px var(--spacing-xs);
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.recipe-card:hover .recipe-category {
+  transform: translateY(-2px);
+  background-color: var(--secondary-color-hover);
 }
 
 .recipe-rating {
@@ -746,10 +926,30 @@ img {
   padding: var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-recipe-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 .view-recipe-btn:hover {
-  background-color: #e67e00;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.view-recipe-btn:hover::before {
+  left: 100%;
 }
 
 /* Recipe Details */
@@ -762,10 +962,12 @@ img {
   margin-bottom: var(--spacing-md);
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 .back-button:hover {
   color: var(--accent-color);
+  transform: translateX(-5px);
 }
 
 .recipe-details {
@@ -774,6 +976,7 @@ img {
   overflow: hidden;
   box-shadow: var(--card-shadow);
   margin-bottom: var(--spacing-xl);
+  animation: fadeIn 0.5s ease-out;
 }
 
 /* Loading Spinner */
@@ -814,16 +1017,23 @@ img {
   height: 100%;
   display: flex;
   flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.day-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .meal-placeholder {
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .meal-placeholder:hover {
   background-color: rgba(var(--primary-color-rgb), 0.1);
   border-color: var(--primary-color);
+  transform: scale(1.02);
 }
 
 /* Modals */
@@ -841,6 +1051,18 @@ img {
 [id$="-modal"] > div {
   max-height: 90vh;
   overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Form Elements */
@@ -858,7 +1080,7 @@ textarea {
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 1rem;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 input[type="text"]:focus,
@@ -869,7 +1091,8 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .dark input[type="text"],
@@ -891,21 +1114,41 @@ button[type="submit"] {
   border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 button[type="submit"]:hover {
-  background-color: #e67e00;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"]:hover::before {
+  left: 100%;
 }
 
 /* Star Rating */
 .star {
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .star:hover {
   color: var(--highlight-color) !important;
+  transform: scale(1.2);
 }
 
 /* Footer */
@@ -914,6 +1157,17 @@ button[type="submit"]:hover {
   padding-top: var(--spacing-xl);
   margin-top: var(--spacing-xxl);
   border-top: 1px solid var(--border-color);
+  position: relative;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--highlight-color));
 }
 
 .footer-content {
@@ -927,6 +1181,23 @@ button[type="submit"]:hover {
   font-family: var(--font-heading);
   color: var(--primary-color);
   margin-bottom: var(--spacing-sm);
+  position: relative;
+  display: inline-block;
+}
+
+.footer-logo h2::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.footer-logo:hover h2::after {
+  width: 100%;
 }
 
 .footer-links h3,
@@ -934,6 +1205,20 @@ button[type="submit"]:hover {
   font-family: var(--font-heading);
   margin-bottom: var(--spacing-md);
   color: var(--text-primary);
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--spacing-xs);
+}
+
+.footer-links h3::after,
+.footer-newsletter h3::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: var(--primary-color);
 }
 
 .footer-links ul li {
@@ -942,10 +1227,26 @@ button[type="submit"]:hover {
 
 .footer-links a {
   color: var(--text-secondary);
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+.footer-links a::before {
+  content: "→";
+  position: absolute;
+  left: -15px;
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
 .footer-links a:hover {
   color: var(--primary-color);
+  transform: translateX(15px);
+}
+
+.footer-links a:hover::before {
+  opacity: 1;
 }
 
 .footer-newsletter p {
@@ -972,10 +1273,12 @@ button[type="submit"]:hover {
   border: none;
   padding: 0 var(--spacing-md);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  transition: all 0.3s ease;
 }
 
 .newsletter-form button:hover {
-  background-color: #e67e00;
+  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
 }
 
 .footer-bottom {
@@ -1001,9 +1304,10 @@ button[type="submit"]:hover {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: var(--transition);
+  transition: all 0.3s ease;
   opacity: 0;
   visibility: hidden;
+  z-index: 99;
 }
 
 #back-to-top.visible {
@@ -1012,8 +1316,9 @@ button[type="submit"]:hover {
 }
 
 #back-to-top:hover {
-  background-color: #e67e00;
-  transform: translateY(-5px);
+  background-color: var(--primary-color-hover);
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Animations */
@@ -1135,4 +1440,3 @@ button[type="submit"]:hover {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
-
